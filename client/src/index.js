@@ -9,11 +9,11 @@ import "./styles/styles.scss";
 const root = createRoot(document.getElementById("root"));
 
 root.render(
-  <React.StrictMode>
+  // <React.StrictMode>
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistedStore}>
         <App />
       </PersistGate>
     </Provider>
-  </React.StrictMode>
+  // </React.StrictMode>
 );

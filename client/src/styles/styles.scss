@@ -8,26 +8,27 @@ body,
   height: 100%;
   width: 100%;
   font-family: "Inter", sans-serif;
+  overflow-x: hidden;
 }
 
 svg {
   cursor: pointer;
 }
 
-button {
-  background-color: transparent;
-  border: none;
-  display: flex;
-  cursor: pointer;
-}
+// button {
+//   background-color: transparent;
+//   border: none;
+//   display: flex;
+//   cursor: pointer;
+// }
 
-input,
-button {
-  outline-color: #4a148c;
-  outline-width: 1px;
-}
+// input,
+// button {
+//   outline-color: #4a148c;
+//   outline-width: 1px;
+// }
 
-input {
-  padding-left: 5px;
-  background-color: transparent;
-}
+// input {
+//   padding-left: 10px;
+//   background-color: transparent;
+// }
