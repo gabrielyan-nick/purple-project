@@ -24,7 +24,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { CSSTransition } from "react-transition-group";
 import { setMode, setLogout } from "../../store/index";
 import { useNavigate } from "react-router-dom";
-import { FlexBetweenBox, Logo } from "components";
+import { FlexBetweenBox, LightLogo, DarkLogo } from "components";
 import useOnClickOutside from "hooks/useOnClickOutside";
 import NavbarToolkit from "components/NavbarToolkit";
 import "../navbar/styles.scss";
@@ -33,7 +33,7 @@ const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const user = useSelector((state) => state.user);
+  const { user, mode } = useSelector((state) => state);
   const isNonMobileScreens = useMediaQuery("(min-width: 1000px)");
   const menuRef = useRef(null);
 
@@ -57,13 +57,17 @@ const Navbar = () => {
   return (
     <FlexBetweenBox padding="10px 50px">
       <FlexBetweenBox gap="50px">
-        <Logo onClick={() => navigate("/home")} />
+        {mode === "light" ? (
+          <LightLogo onClick={() => navigate("/home")} pointer="pointer" />
+        ) : (
+          <DarkLogo onClick={() => navigate("/home")} pointer="pointer" />
+        )}
 
         {isNonMobileScreens && (
           <FlexBetweenBox
             sx={{
               borderRadius: "15px",
-              border: "2px solid #350E65",
+              boxShadow: `0px 0px 6px ${primaryColor}`,
               overflow: "hidden",
             }}
           >
@@ -106,6 +110,7 @@ const Navbar = () => {
       )}
 
       {/* MOBILE NAV */}
+
       <CSSTransition
         timeout={0}
         nodeRef={menuRef}
@@ -113,11 +118,13 @@ const Navbar = () => {
         in={isMobileMenuOpen}
       >
         <Box
-          className="mobile-menu"
+          className={`mobile-menu${
+            isMobileMenuOpen ? " mobile-menu-enter-done" : ""
+          }`}
           ref={menuRef}
           sx={{
             background: altBackground,
-            p: '0 10px'
+            p: "0 10px",
           }}
         >
           <Box display="flex" justifyContent="flex-end" p="5px">
@@ -130,7 +137,6 @@ const Navbar = () => {
             setLogout={onLogOut}
             direction={"column"}
             // fullName={fullName}
-
           />
         </Box>
       </CSSTransition>

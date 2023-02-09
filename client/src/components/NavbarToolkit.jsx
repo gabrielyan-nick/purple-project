@@ -17,7 +17,7 @@ import {
   Notifications,
   Help,
 } from "@mui/icons-material";
-import FlexBetweenBox from "./FlexBetween";
+import FlexBetweenBox from "./FlexBetweenBox";
 
 const NavbarToolkit = ({ setMode, setLogout, fullName, direction = "row" }) => {
   const theme = useTheme();
