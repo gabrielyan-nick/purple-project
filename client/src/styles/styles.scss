@@ -11,9 +11,13 @@ body,
   overflow-x: hidden;
 }
 
-// svg {
-//   cursor: pointer;
-// }
+.MuiFormHelperText-root.Mui-error {
+  position: absolute;
+  bottom: -20px;
+  font-size: 12px;
+}
+
+
 
 // button {
 //   background-color: transparent;

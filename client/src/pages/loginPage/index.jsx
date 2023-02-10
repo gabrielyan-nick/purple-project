@@ -23,7 +23,7 @@ const LoginPage = () => {
         {mode === "light" ? <LightLogo /> : <DarkLogo />}
       </Box>
       <Box
-        width={isNonMobileScreens ? "50%" : "93%"}
+        width={isNonMobileScreens ? "40%" : "85%"}
         p={2}
         mx="auto"
         borderRadius="15px"
@@ -32,8 +32,8 @@ const LoginPage = () => {
         <Typography fontWeight="500" variant="h4" sx={{ mb: 2 }}>
           Welcome to Purple
         </Typography>
+        <RegisterForm />
       </Box>
-      <RegisterForm />
     </Box>
   );
 };

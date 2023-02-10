@@ -1,4 +1,5 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { useNavigate } from "react-router-dom";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
 const initialState = {
   mode: "light",
@@ -7,6 +8,23 @@ const initialState = {
   posts: [],
 };
 
+export const fetchForLogin = createAsyncThunk(
+  "user/fetchForLogin",
+  async (data) => {
+    try {
+      const req = await fetch("http://localhost:3001/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: data,
+      });
+      const res = await req.json();
+      return res;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+);
+
 const authSlice = createSlice({
   name: "auth",
   initialState,
@@ -14,10 +32,10 @@ const authSlice = createSlice({
     setMode: (state) => {
       state.mode = state.mode === "light" ? "dark" : "light";
     },
-    setLogin: (state, action) => {
-      state.user = action.payload.user;
-      state.token = action.payload.token;
-    },
+    // setLogin: (state, action) => {
+    //   state.user = action.payload.user;
+    //   state.token = action.payload.token;
+    // },
     setLogout: (state) => {
       state.user = null;
       state.token = null;
@@ -40,8 +58,17 @@ const authSlice = createSlice({
       state.posts = updatedPosts;
     },
   },
+  extraReducers: (builder) => {
+    builder.addCase(fetchForLogin.fulfilled, (state, action) => {
+      if (action.payload.user && action.payload.token) {
+        state.user = action.payload.user;
+        state.token = action.payload.token;
+       
+      }
+    });
+  },
 });
 
-export const { setMode, setLogin, setLogout, setFriends, setPosts, setPost } =
+export const { setMode, setLogout, setFriends, setPosts, setPost } =
   authSlice.actions;
 export default authSlice.reducer;
