@@ -1,4 +1,4 @@
-import { React, useState } from "react";
+import { React, useState, useEffect } from "react";
 import {
   Box,
   Button,
@@ -61,7 +61,8 @@ const RegisterForm = () => {
   const isNonMobile = useMediaQuery("(min-width: 600px)");
   const isLogin = pageType === "login";
   const isRegister = pageType === "register";
-  console.log(loginError);
+
+  useEffect(() => localStorage.removeItem(loginError), []);
 
   const onToggleShowPassword = () => {
     setShowPassword((showPassword) => !showPassword);
@@ -298,8 +299,6 @@ const TextInput = ({ loginError, userExist = false, ...props }) => {
             ? "User with this email already exist"
             : meta.touched && loginError === "User does not exist"
             ? "User does not exist"
-            : meta.touched && loginError === "Invalid credentials"
-            ? "Invalid credentials"
             : null
         }
       />
@@ -307,11 +306,7 @@ const TextInput = ({ loginError, userExist = false, ...props }) => {
   );
 };
 
-const PasswordInput = ({
-  showPassword,
-  toggleShowPassword,
-  loginError = false,
-}) => {
+const PasswordInput = ({ showPassword, toggleShowPassword, loginError }) => {
   return (
     <>
       <TextInput
@@ -320,6 +315,7 @@ const PasswordInput = ({
         id="password"
         type={`${showPassword ? "text" : "password"}`}
         sx={{ width: "100%" }}
+        loginError={loginError}
       />
       <IconButton
         onClick={toggleShowPassword}
@@ -328,10 +324,11 @@ const PasswordInput = ({
       >
         {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
       </IconButton>
+      {loginError === "Invalid credentials" && (
+        <p className="password-error-text">Invalid password</p>
+      )}
     </>
   );
 };
-
-
 
 export default RegisterForm;

@@ -5,7 +5,6 @@ const initialState = {
   user: null,
   token: null,
   posts: [],
-  // loginError: false,
 };
 
 // export const fetchForLogin = createAsyncThunk(
