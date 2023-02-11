@@ -6,29 +6,32 @@ import {
   useMediaQuery,
   Typography,
   useTheme,
+  IconButton,
 } from "@mui/material";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import { Formik, Form, useField } from "formik";
 import * as yup from "yup";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchForLogin } from "./../store";
+import { setLogin } from "./../store";
 import Dropzone from "react-dropzone";
 import FlexBetweenBox from "./FlexBetweenBox";
 
-const registerSchema = yup.object().shape({
-  firstName: yup.string().required("required"),
-  lastName: yup.string().required("required"),
-  email: yup.string().email("invalid email").required("required"),
-  password: yup.string().min(3).required("required"),
-  location: yup.string().required("required"),
-  occupation: yup.string().required("required"),
-  picture: yup.string().required("required"),
+const registerSchema = yup.object({
+  firstName: yup.string().required("Required"),
+  lastName: yup.string().required("Required"),
+  email: yup.string().email("Invalid email").required("Required"),
+  password: yup.string().min(3).required("Required"),
+  location: yup.string().required("Required"),
+  occupation: yup.string().required("Required"),
+  picture: yup.string().required("Required"),
 });
 
-const loginSchema = yup.object().shape({
-  email: yup.string().email("invalid email").required("required"),
-  password: yup.string().min(3).required("required"),
+const loginSchema = yup.object({
+  email: yup.string().email("Invalid email").required("Required"),
+  password: yup.string().min(3).required("Required"),
 });
 
 const initialValuesRegister = {
@@ -41,13 +44,16 @@ const initialValuesRegister = {
   picture: "",
 };
 
-const initialValuesLogin = {
-  email: "",
-  password: "",
-};
+// const initialValuesLogin = {
+//   email: "",
+//   password: "",
+// };
 
 const RegisterForm = () => {
   const [pageType, setPageType] = useState("login");
+  const [showPassword, setShowPassword] = useState(false);
+  const [userExist, setUserExist] = useState(false);
+  const [loginError, setLoginError] = useState(false);
   const { palette } = useTheme();
   const dispatch = useDispatch();
   const { user, token } = useSelector((state) => state);
@@ -55,8 +61,19 @@ const RegisterForm = () => {
   const isNonMobile = useMediaQuery("(min-width: 600px)");
   const isLogin = pageType === "login";
   const isRegister = pageType === "register";
+  console.log(loginError);
+
+  const onToggleShowPassword = () => {
+    setShowPassword((showPassword) => !showPassword);
+  };
+
+  const onDisableLoginError = () => {
+    setUserExist(false);
+    setLoginError(false);
+  };
 
   const register = async (values, onSubmitProps) => {
+    console.log(values);
     const formData = new FormData(); // Вручную формируем FormData, чтобы добавить изображение
     for (let value in values) {
       formData.append(value, values[value]);
@@ -69,32 +86,40 @@ const RegisterForm = () => {
     );
 
     const savedUser = await savedUserResponse.json();
-    onSubmitProps.resetForm();
 
-    if (savedUser) setPageType("login");
+    if (savedUser === "User already exist") setUserExist(true);
+    if (savedUser && savedUser !== "User already exist") {
+      onSubmitProps.resetForm();
+      setPageType("login");
+    }
   };
 
   const login = async (values, onSubmitProps) => {
-    // const userLoginRequest = await fetch("http://localhost:3001/auth/login", {
-    //   method: "GET",
-    //   body: formData,
-    // });
-    // const userLoginResponse = await userLoginRequest.json();
-    onSubmitProps.resetForm();
-    dispatch(fetchForLogin(JSON.stringify(values)));
-    if (user !== null && token !== null) {
+    const userLoginResponse = await fetch("http://localhost:3001/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(values),
+    });
+    const loggedIn = await userLoginResponse.json();
+
+    if (loggedIn && !loggedIn.msg) {
+      onSubmitProps.resetForm();
+      dispatch(setLogin(loggedIn));
       navigate("/home");
+    } else {
+      setLoginError(loggedIn.msg);
     }
   };
 
   const handleFormSubmit = async (values, onSubmitProps) => {
+    onDisableLoginError();
     if (isLogin) await login(values, onSubmitProps);
     if (isRegister) await register(values, onSubmitProps);
   };
 
   return (
     <Formik
-      initialValues={isLogin ? initialValuesLogin : initialValuesRegister}
+      initialValues={initialValuesRegister}
       validationSchema={isLogin ? loginSchema : registerSchema}
       onSubmit={handleFormSubmit}
     >
@@ -123,18 +148,22 @@ const RegisterForm = () => {
                   sx={{ gridColumn: "span 1" }}
                 />
                 <TextInput
+                  userExist={userExist}
                   label="Email"
                   name="email"
                   id="email"
                   sx={{ gridColumn: "span 2" }}
                 />
-                <TextInput
-                  label="Password"
-                  name="password"
-                  id="password"
-                  type="password"
-                  sx={{ gridColumn: "span 2" }}
-                />
+                <div style={{ gridColumn: "span 2", position: "relative" }}>
+                  <PasswordInput
+                    showPassword={showPassword}
+                    toggleShowPassword={onToggleShowPassword}
+                    // label="Password"
+                    // name="password"
+                    // id="password"
+                  />
+                </div>
+
                 <TextInput
                   label="Location"
                   name="location"
@@ -174,6 +203,7 @@ const RegisterForm = () => {
                         }}
                       >
                         <input {...getInputProps()} />
+
                         {!values.picture ? (
                           <p>Add picture here</p>
                         ) : (
@@ -190,18 +220,19 @@ const RegisterForm = () => {
             ) : (
               <>
                 <TextInput
+                  loginError={loginError}
                   label="Email"
                   name="email"
                   id="email"
                   sx={{ gridColumn: "span 2" }}
                 />
-                <TextInput
-                  label="Password"
-                  name="password"
-                  id="password"
-                  type="password"
-                  sx={{ gridColumn: "span 2" }}
-                />
+                <div style={{ gridColumn: "span 2", position: "relative" }}>
+                  <PasswordInput
+                    showPassword={showPassword}
+                    toggleShowPassword={onToggleShowPassword}
+                    loginError={loginError}
+                  />
+                </div>
               </>
             )}
           </Box>
@@ -246,17 +277,61 @@ const RegisterForm = () => {
   );
 };
 
-const TextInput = ({ ...props }) => {
+const TextInput = ({ loginError, userExist = false, ...props }) => {
   const [field, meta] = useField(props);
+
   return (
-    <TextField
-      {...field}
-      {...props}
-      label={props.label}
-      error={Boolean(meta.touched) && Boolean(meta.error)}
-      helperText={meta.touched && meta.error}
-    />
+    <>
+      <TextField
+        {...field}
+        {...props}
+        label={props.label}
+        error={
+          (Boolean(meta.touched) && Boolean(meta.error)) ||
+          userExist ||
+          Boolean(loginError)
+        }
+        helperText={
+          meta.touched && !userExist && !loginError
+            ? meta.error
+            : meta.touched && userExist
+            ? "User with this email already exist"
+            : meta.touched && loginError === "User does not exist"
+            ? "User does not exist"
+            : meta.touched && loginError === "Invalid credentials"
+            ? "Invalid credentials"
+            : null
+        }
+      />
+    </>
   );
 };
+
+const PasswordInput = ({
+  showPassword,
+  toggleShowPassword,
+  loginError = false,
+}) => {
+  return (
+    <>
+      <TextInput
+        label="Password"
+        name="password"
+        id="password"
+        type={`${showPassword ? "text" : "password"}`}
+        sx={{ width: "100%" }}
+      />
+      <IconButton
+        onClick={toggleShowPassword}
+        sx={{ position: "absolute", right: "5px", top: "20%" }}
+        size="small"
+      >
+        {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+      </IconButton>
+    </>
+  );
+};
+
+
 
 export default RegisterForm;

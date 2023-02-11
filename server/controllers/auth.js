@@ -10,14 +10,14 @@ export const register = async (req, res) => {
       lastName,
       email,
       password,
-      friends,   //
+      friends, //
       picturePath,
       location,
       occupation,
     } = req.body;
 
     const salt = await bcrypt.genSalt();
-    const passwordHash = bcrypt.hash(password, salt);
+    const passwordHash = await bcrypt.hash(password, salt);
 
     const newUser = new User({
       firstName,
@@ -31,6 +31,9 @@ export const register = async (req, res) => {
       viewedProfile: Math.floor(Math.random() * 10000),
       impressions: Math.floor(Math.random() * 10000),
     });
+    const existingUser = await User.findOne({ email });
+    if (existingUser) return res.status(401).json("User already exist");
+
     const savedUser = await newUser.save();
     res.status(201).json(savedUser);
   } catch (error) {
