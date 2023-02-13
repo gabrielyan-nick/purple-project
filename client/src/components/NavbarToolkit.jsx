@@ -10,7 +10,6 @@ import {
   useTheme,
 } from "@mui/material";
 import {
-
   Message,
   DarkMode,
   LightMode,
@@ -48,15 +47,15 @@ const NavbarToolkit = ({ setMode, setLogout, fullName, direction = "row" }) => {
 
       <FormControl
         variant="standard"
-        // value={fullName}
+        value={fullName}
       >
         <Select
-          //    value={fullName}
+          value={fullName}
           sx={{
             backgroundColor: `${
               direction === "column" ? background : altBackground
             }`,
-            width: "150px",
+            width: "180px",
             boxShadow: `0px 0px 6px ${primaryColor}`,
 
             borderRadius: "5px",
@@ -65,6 +64,7 @@ const NavbarToolkit = ({ setMode, setLogout, fullName, direction = "row" }) => {
               p: "0 5px",
               width: "30px",
               color: primaryColor,
+              transition: "all .3s",
             },
             "& .MuiSelect-select:focus": {
               backgroundColor: `${
@@ -74,10 +74,8 @@ const NavbarToolkit = ({ setMode, setLogout, fullName, direction = "row" }) => {
           }}
           input={<InputBase />}
         >
-          <MenuItem
-          //   value={fullName}
-          >
-            {/* <Typography>{fullName}</Typography> */}
+          <MenuItem value={fullName}>
+            <Typography>{fullName}</Typography>
           </MenuItem>
           <MenuItem onClick={setLogout}>Log Out</MenuItem>
         </Select>

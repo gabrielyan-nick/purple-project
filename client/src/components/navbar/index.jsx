@@ -12,11 +12,6 @@ import {
 } from "@mui/material";
 import {
   Search,
-  Message,
-  DarkMode,
-  LightMode,
-  Notifications,
-  Help,
   Menu,
   Close,
 } from "@mui/icons-material";
@@ -27,7 +22,7 @@ import { useNavigate } from "react-router-dom";
 import { FlexBetweenBox, LightLogo, DarkLogo } from "components";
 import useOnClickOutside from "hooks/useOnClickOutside";
 import NavbarToolkit from "components/NavbarToolkit";
-import "../navbar/styles.scss";
+import "./styles.scss";
 
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -42,7 +37,7 @@ const Navbar = () => {
   const altBackground = theme.palette.background.alt;
   const primaryColor = theme.palette.primary.main;
   const primaryLightColor = theme.palette.primary.light;
-  // const fullName = `${user.firstName} ${user.lastName}`;
+  const fullName = `${user.firstName} ${user.lastName}`;
 
   useOnClickOutside(menuRef, () => setIsMobileMenuOpen(false));
 
@@ -52,6 +47,7 @@ const Navbar = () => {
 
   const onLogOut = () => {
     dispatch(setLogout());
+    navigate("/");
   };
 
   return (
@@ -101,7 +97,7 @@ const Navbar = () => {
         <NavbarToolkit
           setMode={onSetMode}
           setLogout={onLogOut}
-          // fullName={fullName}
+          fullName={fullName}
         />
       ) : (
         <IconButton onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
@@ -136,7 +132,7 @@ const Navbar = () => {
             setMode={onSetMode}
             setLogout={onLogOut}
             direction={"column"}
-            // fullName={fullName}
+            fullName={fullName}
           />
         </Box>
       </CSSTransition>

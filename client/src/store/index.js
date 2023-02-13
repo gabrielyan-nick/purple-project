@@ -7,23 +7,6 @@ const initialState = {
   posts: [],
 };
 
-// export const fetchForLogin = createAsyncThunk(
-//   "user/fetchForLogin",
-//   async (data) => {
-//     try {
-//       const req = await fetch("http://localhost:3001/auth/login", {
-//         method: "POST",
-//         headers: { "Content-Type": "application/json" },
-//         body: data,
-//       });
-//       const res = await req.json();
-//       return res;
-//     } catch (error) {
-//       console.log(error);
-//     }
-//   }
-// );
-
 const authSlice = createSlice({
   name: "auth",
   initialState,
@@ -57,18 +40,6 @@ const authSlice = createSlice({
       state.posts = updatedPosts;
     },
   },
-  // extraReducers: (builder) => {
-  //   builder
-  //     .addCase(fetchForLogin.fulfilled, (state, action) => {
-  //       if (action.payload.user && action.payload.token) {
-  //         state.user = action.payload.user;
-  //         state.token = action.payload.token;
-  //       }
-  //     })
-  // .addCase(fetchForLogin.rejected, (state) => {
-  //   state.loginError = true;
-  // });
-  // },
 });
 
 export const { setMode, setLogout, setLogin, setFriends, setPosts, setPost } =

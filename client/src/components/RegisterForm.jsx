@@ -62,8 +62,6 @@ const RegisterForm = () => {
   const isLogin = pageType === "login";
   const isRegister = pageType === "register";
 
-  useEffect(() => localStorage.removeItem(loginError), []);
-
   const onToggleShowPassword = () => {
     setShowPassword((showPassword) => !showPassword);
   };
@@ -74,7 +72,6 @@ const RegisterForm = () => {
   };
 
   const register = async (values, onSubmitProps) => {
-    console.log(values);
     const formData = new FormData(); // Вручную формируем FormData, чтобы добавить изображение
     for (let value in values) {
       formData.append(value, values[value]);
@@ -85,7 +82,6 @@ const RegisterForm = () => {
       "http://localhost:3001/auth/register",
       { method: "POST", body: formData }
     );
-
     const savedUser = await savedUserResponse.json();
 
     if (savedUser === "User already exist") setUserExist(true);
@@ -159,12 +155,8 @@ const RegisterForm = () => {
                   <PasswordInput
                     showPassword={showPassword}
                     toggleShowPassword={onToggleShowPassword}
-                    // label="Password"
-                    // name="password"
-                    // id="password"
                   />
                 </div>
-
                 <TextInput
                   label="Location"
                   name="location"
@@ -280,7 +272,6 @@ const RegisterForm = () => {
 
 const TextInput = ({ loginError, userExist = false, ...props }) => {
   const [field, meta] = useField(props);
-
   return (
     <>
       <TextField
