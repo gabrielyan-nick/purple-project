@@ -7,6 +7,7 @@ export const createPost = async (req, res) => {
     const { userId, description, picturePath } = req.body;
     const user = await User.findById(userId);
     const newPost = new Post({
+      userId,
       firstName: user.firstName,
       lastName: user.lastName,
       location: user.location,
@@ -27,8 +28,8 @@ export const createPost = async (req, res) => {
 
 export const getFeedPosts = async (req, res) => {
   try {
-    const posts = await Post.find();
-    res.status(200).json(posts);
+    const post = await Post.find();
+    res.status(200).json(post);
   } catch (error) {
     res.status(404).json({ message: error.message });
   }

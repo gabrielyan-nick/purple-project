@@ -173,7 +173,8 @@ const RegisterForm = () => {
                   gridColumn="span 2"
                   sx={{
                     boxShadow: `0px 0px 6px ${palette.primary.main}`,
-                    borderRadius: "10px",
+                    borderRadius: "5px",
+                    height: '50px'
                   }}
                   p={1}
                 >

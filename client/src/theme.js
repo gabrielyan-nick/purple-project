@@ -7,17 +7,20 @@ export const themeSettings = (mode) => {
         ? {
             // palette values for dark mode
             primary: {
-              light: '#4C3575',
+              light: "#4C3575",
               main: "#bfebdd",
             },
             background: {
               default: "#03001C",
-              alt: "#1c113b",
+              alt: "#160d2e",
             },
             text: {
               primary: "#fff",
               secondary: "#E6E6FF",
               disabled: "#04001A",
+            },
+            buttons: {
+              main: "#38006b",
             },
           }
         : {
@@ -35,9 +38,9 @@ export const themeSettings = (mode) => {
               secondary: "#19004D",
               disabled: "#41354A",
             },
-            // buttons: {
-            //   hover: 
-            // }
+            buttons: {
+              main: "#12005e",
+            },
           }),
     },
     typography: {

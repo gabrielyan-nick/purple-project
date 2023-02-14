@@ -5,4 +5,5 @@ export { default as RegisterForm } from "./RegisterForm.jsx";
 export { default as Navbar } from "./navbar";
 export { default as UserImage } from "./widgets/UserImage";
 export { default as WidgetWrapper } from "./widgets/WidgetWrapper";
-
+export { default as UserWidget } from "./widgets/UserWidget";
+export { default as MyPostWidget } from "./widgets/MyPostWidget/MyPostWidget";

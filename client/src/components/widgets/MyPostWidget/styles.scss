@@ -1,0 +1,13 @@
+.dropzone {
+  opacity: 0;
+  -webkit-transform: translate3d(0, -100%, 0);
+  transform: translate3d(0, -100%, 0);
+  transition: all 300ms;
+}
+
+.dropzone-enter-done {
+  opacity: 1;
+  -webkit-transform: translate3d(0, 0, 0);
+  transform: translate3d(0, 0, 0);
+  transition: all 300ms;
+}

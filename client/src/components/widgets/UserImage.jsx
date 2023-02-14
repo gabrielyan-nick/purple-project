@@ -1,14 +1,15 @@
 import { Box } from "@mui/material";
 
-const UserImage = ({ image, size = "60px" }) => {
+const UserImage = ({ image, size = "60px", navigate }) => {
   return (
     <Box width={size} height={size}>
       <img
         src={`http://localhost:3001/assets/${image}`}
         alt="user"
-        style={{ objectFit: "cover", borderRadius: "50%" }}
+        style={{ objectFit: "cover", borderRadius: "50%", cursor: "pointer" }}
         width={size}
         height={size}
+        onClick={navigate}
       />
     </Box>
   );
