@@ -8,11 +8,12 @@ export const themeSettings = (mode) => {
             // palette values for dark mode
             primary: {
               light: "#4C3575",
-              main: "#bfebdd",
+              main: "#cbebe0",
             },
             background: {
               default: "#03001C",
               alt: "#160d2e",
+              light: "#150826",
             },
             text: {
               primary: "#fff",
@@ -32,6 +33,7 @@ export const themeSettings = (mode) => {
             background: {
               default: "#E6FFF7",
               alt: "#e8eaf6",
+              light: "#90d4b7",
             },
             text: {
               primary: "#000",

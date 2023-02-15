@@ -29,20 +29,18 @@ body,
   padding-right: 20px;
 }
 
-// button {
-//   background-color: transparent;
-//   border: none;
-//   display: flex;
-//   cursor: pointer;
-// }
+.MuiPopover-paper {
+  background-color: #e8eaf6;
+}
 
-// input,
-// button {
-//   outline-color: #4a148c;
-//   outline-width: 1px;
-// }
+.css-16w8ql3-MuiPaper-root-MuiPopover-paper {
+  display: flex;
+  justify-content: space-between;
+  padding: 5px 10px;
+  width: 70%;
+}
 
-// input {
-//   padding-left: 10px;
-//   background-color: transparent;
-// }
+
+@import 'mediaQueries';
+
+

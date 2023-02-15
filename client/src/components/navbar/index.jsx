@@ -10,11 +10,7 @@ import {
   useTheme,
   useMediaQuery,
 } from "@mui/material";
-import {
-  Search,
-  Menu,
-  Close,
-} from "@mui/icons-material";
+import { Search, Menu, Close } from "@mui/icons-material";
 import { useDispatch, useSelector } from "react-redux";
 import { CSSTransition } from "react-transition-group";
 import { setMode, setLogout } from "../../store/index";
@@ -36,7 +32,6 @@ const Navbar = () => {
   const background = theme.palette.background.default;
   const altBackground = theme.palette.background.alt;
   const primaryColor = theme.palette.primary.main;
-  const primaryLightColor = theme.palette.primary.light;
   const fullName = `${user.firstName} ${user.lastName}`;
 
   useOnClickOutside(menuRef, () => setIsMobileMenuOpen(false));
@@ -101,7 +96,7 @@ const Navbar = () => {
         />
       ) : (
         <IconButton onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
-          <Menu sx={{ fontSize: "30px" }} />
+          <Menu sx={{ fontSize: "30px", color: primaryColor }} />
         </IconButton>
       )}
 
@@ -119,13 +114,13 @@ const Navbar = () => {
           }`}
           ref={menuRef}
           sx={{
-            background: altBackground,
+            background: theme.palette.background.light,
             p: "0 10px",
           }}
         >
           <Box display="flex" justifyContent="flex-end" p="5px">
             <IconButton onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
-              <Close sx={{ fontSize: "30px" }} />
+              <Close sx={{ fontSize: "30px", color: primaryColor }} />
             </IconButton>
           </Box>
           <NavbarToolkit
