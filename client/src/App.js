@@ -9,9 +9,9 @@ import LoginPage from "pages/loginPage";
 import ProfilePage from "pages/profilePage";
 
 const App = () => {
-  const mode = useSelector((state) => state.mode);
+  const mode = useSelector((state) => state.auth.mode);
   const theme = useMemo(() => createTheme(themeSettings(mode)), [mode]);
-  const isAuth = !!useSelector((state) => state.token);
+  const isAuth = !!useSelector((state) => state.auth.token);
 
   return (
     <div className="app">

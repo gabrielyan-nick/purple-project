@@ -1,4 +1,8 @@
-import { configureStore, getDefaultMiddleware } from "@reduxjs/toolkit";
+import {
+  configureStore,
+  getDefaultMiddleware,
+  combineReducers,
+} from "@reduxjs/toolkit";
 import {
   persistStore,
   persistReducer,
@@ -11,13 +15,20 @@ import {
 } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 import authReducer from "./index.js";
+import userWidgetReducer from "../components/UserWidget/userWidgetSlice";
 
 const persistConfig = {
   key: "root",
   storage,
   version: 1,
 };
-const persistedReducer = persistReducer(persistConfig, authReducer);
+
+const rootReducer = combineReducers({
+  auth: authReducer,
+  userWidget: userWidgetReducer,
+});
+
+const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 export const store = configureStore({
   reducer: persistedReducer,

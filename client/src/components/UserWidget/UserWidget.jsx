@@ -4,37 +4,37 @@ import {
   LocationOnOutlined,
   WorkOutlineOutlined,
 } from "@mui/icons-material";
+import ContentLoader from "react-content-loader";
 import { Box, Typography, Divider, useTheme } from "@mui/material";
 import { UserImage, FlexBetweenBox, WidgetWrapper } from "components";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { fetchUserData } from "./userWidgetSlice";
 
 const UserWidget = ({ userId, picturePath }) => {
-  const [user, setUser] = useState(null);
+  const dispatch = useDispatch();
   const { palette } = useTheme();
   const navigate = useNavigate();
-  const token = useSelector((state) => state.token);
+  const { token, mode } = useSelector((state) => state.auth);
+  const user = useSelector((state) => state.userWidget.userData);
+  const userWidgetLoadingStatus = useSelector(
+    (state) => state.userWidget.userLoadingStatus
+  );
 
-  const getUser = async () => {
-    const response = await fetch(`http://localhost:3001/users/${userId}`, {
-      method: "GET",
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    const data = await response.json();
-    setUser(data);
-  };
-
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
-    getUser();
+    dispatch(fetchUserData({ userId, token }));
   }, []);
 
   const onNavigate = () => {
     navigate(`/profile/${userId}`);
   };
 
-  if (!user) return null;
+  if (
+    userWidgetLoadingStatus === "loading" ||
+    userWidgetLoadingStatus === "error"
+  )
+    return <UserWidgetSkeleton />;
 
   const {
     firstName,
@@ -60,11 +60,10 @@ const UserWidget = ({ userId, picturePath }) => {
                 cursor: "pointer",
               }}
               onClick={onNavigate}
-              
             >
               {firstName} {lastName}
             </Typography>
-            <Typography>{friends.length} friends</Typography>
+            <Typography>{friends?.length} friends</Typography>
           </Box>
         </FlexBetweenBox>
         <ManageAccountsOutlined
@@ -145,3 +144,23 @@ const UserWidget = ({ userId, picturePath }) => {
 };
 
 export default UserWidget;
+
+const UserWidgetSkeleton = () => {
+  const { palette } = useTheme();
+  return (
+    <ContentLoader
+      speed={2}
+      width="100%"
+      height={380}
+      backgroundColor={palette.skeleton.background}
+      foregroundColor={palette.skeleton.foreground}
+    >
+      <circle cx="45" cy="50" r="30" />
+      <rect x="91" y="33" rx="4" ry="4" width="60%" height="19" />
+      <rect x="91" y="56" rx="4" ry="4" width="35%" height="13" />
+      <rect x="19" y="98" rx="4" ry="4" width="90%" height="55" />
+      <rect x="19" y="163" rx="4" ry="4" width="90%" height="55" />
+      <rect x="19" y="228" rx="4" ry="4" width="90%" height="110" />
+    </ContentLoader>
+  );
+};

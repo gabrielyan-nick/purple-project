@@ -14,7 +14,7 @@ import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import { Formik, Form, useField } from "formik";
 import * as yup from "yup";
 import { useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { setLogin } from "./../store";
 import Dropzone from "react-dropzone";
 import FlexBetweenBox from "./FlexBetweenBox";
@@ -56,7 +56,6 @@ const RegisterForm = () => {
   const [loginError, setLoginError] = useState(false);
   const { palette } = useTheme();
   const dispatch = useDispatch();
-  const { user, token } = useSelector((state) => state);
   const navigate = useNavigate();
   const isNonMobile = useMediaQuery("(min-width: 600px)");
   const isLogin = pageType === "login";
@@ -174,7 +173,7 @@ const RegisterForm = () => {
                   sx={{
                     boxShadow: `0px 0px 6px ${palette.primary.main}`,
                     borderRadius: "5px",
-                    height: '50px'
+                    height: '60px'
                   }}
                   p={1}
                 >
@@ -184,6 +183,8 @@ const RegisterForm = () => {
                     onDrop={(acceptedFiles) =>
                       setFieldValue("picture", acceptedFiles[0])
                     }
+                    
+                 
                   >
                     {({ getRootProps, getInputProps }) => (
                       <Box
@@ -194,6 +195,8 @@ const RegisterForm = () => {
                           border: `1px dashed ${palette.primary.main}`,
                           display: "flex",
                           justifyContent: "center",
+                          alignItems: 'center',
+                         height: '100%'
                         }}
                       >
                         <input {...getInputProps()} />

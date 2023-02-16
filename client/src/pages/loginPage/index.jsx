@@ -7,7 +7,7 @@ const LoginPage = () => {
   const theme = useTheme();
   const altBackground = theme.palette.background.alt;
   const isNonMobileScreens = useMediaQuery("(min-width: 1000px)");
-  const { mode } = useSelector((state) => state);
+  const mode = useSelector((state) => state.auth.mode);
 
   return (
     <Box>

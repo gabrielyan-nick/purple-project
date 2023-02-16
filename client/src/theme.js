@@ -23,6 +23,10 @@ export const themeSettings = (mode) => {
             buttons: {
               main: "#38006b",
             },
+            skeleton: {
+              background: "#221646",
+              foreground: "#392c61",
+            },
           }
         : {
             // palette values for light mode
@@ -42,6 +46,10 @@ export const themeSettings = (mode) => {
             },
             buttons: {
               main: "#12005e",
+            },
+            skeleton: {
+              background: "#debeec",
+              foreground: "#E6FFF7",
             },
           }),
     },

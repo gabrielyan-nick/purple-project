@@ -9,7 +9,6 @@ export const LightLogo = ({ pointer = "default" }) => {
       xmlnsXlink="http://www.w3.org/1999/xlink"
       xmlnssvgjs="http://svgjs.dev/svgjs"
       width="200"
-      // height="469"
       viewBox="0 0 2000 469"
     >
       <g transform="matrix(1,0,0,1,-1.2120977385694687,0.6499780518880982)">

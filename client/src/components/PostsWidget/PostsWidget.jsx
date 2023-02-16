@@ -1,11 +1,11 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { setPosts } from "./../../store";
-import { PostWidget } from "./../index";
+import { setPosts } from "../../store";
+import { PostWidget } from "../index";
 
 const PostsWidget = ({ userId, isProfile = false }) => {
   const dispatch = useDispatch();
-  const { posts, token } = useSelector((state) => state);
+  const { posts, token } = useSelector((state) => state.auth);
 
   const getPosts = async () => {
     const response = await fetch(`http://localhost:3001/posts`, {
@@ -13,7 +13,7 @@ const PostsWidget = ({ userId, isProfile = false }) => {
       headers: { Authorization: `Bearer ${token}` },
     });
     const posts = await response.json();
-    dispatch(setPosts({ posts }));
+    dispatch(setPosts(posts));
   };
 
   const getUserPosts = async () => {
@@ -25,7 +25,7 @@ const PostsWidget = ({ userId, isProfile = false }) => {
       }
     );
     const posts = await response.json();
-    dispatch(setPosts({ posts }));
+    dispatch(setPosts(posts ));
   };
 
   useEffect(() => {

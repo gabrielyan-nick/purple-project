@@ -1,6 +1,7 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { setPosts } from "../../store";
+import { setPosts } from "../store";
 import {
   Box,
   Divider,
@@ -30,10 +31,15 @@ const MyPostWidget = ({ picturePath }) => {
   const [post, setPost] = useState("");
   const [anchorEl, setAnchorEl] = useState(null);
   const { palette } = useTheme();
-  const { _id } = useSelector((state) => state.user);
-  const token = useSelector((state) => state.token);
+  const { _id } = useSelector((state) => state.auth.user);
+  const token = useSelector((state) => state.auth.token);
   const isNonMobileScreens = useMediaQuery("(min-width: 500px)");
   const imageNameArr = image?.name.split(".");
+  const navigate = useNavigate();
+
+  const onNavigate = () => {
+    navigate(`/profile/${_id}`);
+  };
 
   const handlePost = async () => {
     const formData = new FormData();
@@ -66,7 +72,7 @@ const MyPostWidget = ({ picturePath }) => {
   return (
     <WidgetWrapper>
       <FlexBetweenBox gap="15px">
-        <UserImage image={picturePath} />
+        <UserImage image={picturePath} navigate={onNavigate} />
         <InputBase
           placeholder="What's on your mind?"
           onChange={(e) => setPost(e.target.value)}
@@ -76,7 +82,7 @@ const MyPostWidget = ({ picturePath }) => {
             width: "100%",
             backgroundColor: "transparent",
             borderRadius: "15px",
-            padding: "5px 10px",
+            padding: "10px",
             boxShadow: `0px 0px 6px ${palette.primary.main}`,
           }}
         />
