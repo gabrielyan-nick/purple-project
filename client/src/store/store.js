@@ -16,6 +16,7 @@ import {
 import storage from "redux-persist/lib/storage";
 import authReducer from "./index.js";
 import userWidgetReducer from "../components/UserWidget/userWidgetSlice";
+import postsWidgetReducer from "../components/PostsWidget/postsWidgetSlice";
 
 const persistConfig = {
   key: "root",
@@ -26,6 +27,7 @@ const persistConfig = {
 const rootReducer = combineReducers({
   auth: authReducer,
   userWidget: userWidgetReducer,
+  postsWidget: postsWidgetReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

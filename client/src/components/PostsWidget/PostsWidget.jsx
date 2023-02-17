@@ -1,36 +1,17 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { setPosts } from "../../store";
+import { fetchPosts, fetchUserPosts } from "./postsWidgetSlice";
 import { PostWidget } from "../index";
 
 const PostsWidget = ({ userId, isProfile = false }) => {
   const dispatch = useDispatch();
-  const { posts, token } = useSelector((state) => state.auth);
-
-  const getPosts = async () => {
-    const response = await fetch(`http://localhost:3001/posts`, {
-      method: "GET",
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    const posts = await response.json();
-    dispatch(setPosts(posts));
-  };
-
-  const getUserPosts = async () => {
-    const response = await fetch(
-      `http://localhost:3001/posts/${userId}/posts`,
-      {
-        method: "GET",
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    );
-    const posts = await response.json();
-    dispatch(setPosts(posts ));
-  };
+  const token = useSelector((state) => state.auth.token);
+  const { posts } = useSelector((state) => state.postsWidget);
 
   useEffect(() => {
-    isProfile ? getUserPosts() : getPosts();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    isProfile
+      ? dispatch(fetchUserPosts({ userId, token }))
+      : dispatch(fetchPosts(token));
   }, []);
 
   return (
@@ -47,6 +28,7 @@ const PostsWidget = ({ userId, isProfile = false }) => {
           userPicturePath,
           likes,
           comments,
+          createdAt,
         }) => (
           <PostWidget
             key={_id}
@@ -59,6 +41,7 @@ const PostsWidget = ({ userId, isProfile = false }) => {
             userPicturePath={userPicturePath}
             likes={likes}
             comments={comments}
+            createdAt={createdAt}
           />
         )
       )}

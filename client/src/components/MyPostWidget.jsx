@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { setPosts } from "../store";
+import { addMyPost } from "./PostsWidget/postsWidgetSlice";
 import {
   Box,
   Divider,
@@ -31,8 +31,9 @@ const MyPostWidget = ({ picturePath }) => {
   const [post, setPost] = useState("");
   const [anchorEl, setAnchorEl] = useState(null);
   const { palette } = useTheme();
-  const { _id } = useSelector((state) => state.auth.user);
+  const _id = useSelector((state) => state.auth.user._id);
   const token = useSelector((state) => state.auth.token);
+  const initPosts = useSelector((state) => state.postsWidget.posts);
   const isNonMobileScreens = useMediaQuery("(min-width: 500px)");
   const imageNameArr = image?.name.split(".");
   const navigate = useNavigate();
@@ -41,7 +42,7 @@ const MyPostWidget = ({ picturePath }) => {
     navigate(`/profile/${_id}`);
   };
 
-  const handlePost = async () => {
+  const handlePost = () => {
     const formData = new FormData();
     formData.append("userId", _id);
     formData.append("description", post);
@@ -49,16 +50,10 @@ const MyPostWidget = ({ picturePath }) => {
       formData.append("picture", image);
       formData.append("picturePath", image.name);
     }
-
-    const response = await fetch(`http://localhost:3001/posts`, {
-      method: "POST",
-      headers: { Authorization: `Bearer ${token}` },
-      body: formData,
+    dispatch(addMyPost({ formData, token, initPosts })).then(() => {
+      setImage(null);
+      setPost("");
     });
-    const posts = await response.json();
-    dispatch(setPosts({ posts }));
-    setImage("");
-    setPost("");
   };
 
   const handleClickPopover = (e) => {

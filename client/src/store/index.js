@@ -1,11 +1,29 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
 const initialState = {
   mode: "light",
   user: null,
   token: null,
-  posts: [],
 };
+
+export const patchFriend = createAsyncThunk(
+  "user/patchFriend",
+  async ({ _id, friendId, token }) => {
+    const response = await fetch(
+      `http://localhost:3001/users/${_id}/${friendId}`,
+      {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    const friends = await response.json();
+    if (friends.message) return [];
+    return friends;
+  }
+);
 
 const authSlice = createSlice({
   name: "auth",
@@ -22,26 +40,17 @@ const authSlice = createSlice({
       state.user = null;
       state.token = null;
     },
-    setFriends: (state, action) => {
+  },
+  extraReducers: (builder) => {
+    builder.addCase(patchFriend.fulfilled, (state, action) => {
       if (state.user) {
         state.user.friends = action.payload;
       } else {
         console.error("There are no friends :(");
       }
-    },
-    setPosts: (state, action) => {
-      state.posts = action.payload;
-    },
-    setPost: (state, action) => {
-      const updatedPosts = state.posts.map((post) => {
-        if (post._id === action.payload.post._id) return action.payload.post;
-        return post;
-      });
-      state.posts = updatedPosts;
-    },
+    });
   },
 });
 
-export const { setMode, setLogout, setLogin, setFriends, setPosts, setPost } =
-  authSlice.actions;
+export const { setMode, setLogout, setLogin } = authSlice.actions;
 export default authSlice.reducer;

@@ -3,7 +3,7 @@ import { Box, IconButton, Typography, useTheme } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { FlexBetweenBox, UserImage } from "./index";
-import { setFriends } from "./../store/index";
+import { patchFriend } from "./../store/index";
 
 const Friend = ({ friendId, name, subtitle, userPicturePath }) => {
   const dispatch = useDispatch();
@@ -12,20 +12,10 @@ const Friend = ({ friendId, name, subtitle, userPicturePath }) => {
   const { friends, _id } = useSelector((state) => state.auth.user);
   const { palette } = useTheme();
   const isFriend = friends.find((friend) => friend._id === friendId);
+  const isMyPost = _id === friendId;
 
-  const patchFriend = async () => {
-    const response = await fetch(
-      `http://localhost:3001/users/${_id}/${friendId}`,
-      {
-        method: "PATCH",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      }
-    );
-    const friends = await response.json();
-    dispatch(setFriends(friends));
+  const onPatchFriend = () => {
+    dispatch(patchFriend({ _id, friendId, token }));
   };
 
   const onNavigate = () => {
@@ -51,13 +41,15 @@ const Friend = ({ friendId, name, subtitle, userPicturePath }) => {
           <Typography>{subtitle}</Typography>
         </Box>
       </FlexBetweenBox>
-      <IconButton onClick={() => patchFriend()}>
-        {isFriend ? (
-          <PersonRemoveOutlined sx={{ color: palette.primary.main }} />
-        ) : (
-          <PersonAddOutlined sx={{ color: palette.primary.main }} />
-        )}
-      </IconButton>
+      {!isMyPost && (
+        <IconButton onClick={onPatchFriend}>
+          {isFriend ? (
+            <PersonRemoveOutlined sx={{ color: palette.primary.main }} />
+          ) : (
+            <PersonAddOutlined sx={{ color: palette.primary.main }} />
+          )}
+        </IconButton>
+      )}
     </FlexBetweenBox>
   );
 };
