@@ -16,7 +16,7 @@ import {
 import storage from "redux-persist/lib/storage";
 import authReducer from "./index.js";
 import userWidgetReducer from "../components/UserWidget/userWidgetSlice";
-import postsWidgetReducer from "../components/PostsWidget/postsWidgetSlice";
+import postsWidgetReducer from "../components/PostsWidgets/postsWidgetsSlice";
 
 const persistConfig = {
   key: "root",

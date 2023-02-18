@@ -1,5 +1,6 @@
 import Post from "../models/Post.js";
 import User from "../models/User.js";
+import Comment from "../models/Comment.js";
 
 export const createPost = async (req, res) => {
   try {
@@ -18,8 +19,19 @@ export const createPost = async (req, res) => {
     });
     await newPost.save();
 
-    const post = await Post.find();
-    res.status(201).json(post);
+    const posts = await Post.find().sort({ createdAt: -1 });
+    res.status(201).json(posts);
+  } catch (error) {
+    res.status(409).json({ message: error.message });
+  }
+};
+
+export const deletePost = async (req, res) => {
+  try {
+    const { postId } = req.params;
+    await Post.findByIdAndDelete(postId);
+    const posts = await Post.find().sort({ createdAt: -1 });
+    res.status(200).json(posts);
   } catch (error) {
     res.status(409).json({ message: error.message });
   }
@@ -29,23 +41,39 @@ export const addComment = async (req, res) => {
   try {
     const { postId } = req.params;
     const { userId, text } = req.body;
-    const user = await User.findById(userId);  
+    const user = await User.findById(userId);
     const post = await Post.findById(postId);
 
-    // const newComment = {
-    //   userId,
-    //   firstName: user.firstName,
-    //   lastName: user.lastName,
-    //   userPicturePath: user.picturePath,
-    //   text,
-    // };
-    // post.comments.push(newComment);
-    // const updatedPost = await Post.findByIdAndUpdate(
-    //   postId,
-    //   { comments: post.comments },
-    //   { new: true }
-    // );
-    res.status(201).json(user);
+    const newComment = new Comment({
+      userId,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      userPicturePath: user.picturePath,
+      text,
+    });
+    await newComment.save();
+    post.comments.push(newComment);
+    const updatedPost = await Post.findByIdAndUpdate(
+      postId,
+      { comments: post.comments },
+      { new: true }
+    );
+    res.status(201).json(updatedPost);
+  } catch (error) {
+    res.status(409).json({ message: error.message });
+  }
+};
+
+export const deleteComment = async (req, res) => {
+  try {
+    const { postId, commentId } = req.params;
+    const post = await Post.findById(postId);
+
+    const comment = post.comments.id(commentId);
+    comment.remove();
+
+    const updatedPost = await post.save();
+    res.status(200).json(updatedPost);
   } catch (error) {
     res.status(409).json({ message: error.message });
   }

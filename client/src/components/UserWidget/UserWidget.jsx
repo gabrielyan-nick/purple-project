@@ -8,7 +8,7 @@ import ContentLoader from "react-content-loader";
 import { Box, Typography, Divider, useTheme } from "@mui/material";
 import { UserImage, FlexBetweenBox, WidgetWrapper } from "components";
 import { useSelector, useDispatch } from "react-redux";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { fetchUserData } from "./userWidgetSlice";
 
@@ -16,11 +16,14 @@ const UserWidget = ({ userId, picturePath }) => {
   const dispatch = useDispatch();
   const { palette } = useTheme();
   const navigate = useNavigate();
-  const { token, mode } = useSelector((state) => state.auth);
+  const { token } = useSelector((state) => state.auth);
+  const loggedInUserId = useSelector((state) => state.auth.user._id);
+  const loggedInUser = useSelector((state) => state.auth.user);
   const user = useSelector((state) => state.userWidget.userData);
   const userWidgetLoadingStatus = useSelector(
     (state) => state.userWidget.userLoadingStatus
   );
+  const isMyUserWidget = loggedInUserId === userId;
 
   useEffect(() => {
     dispatch(fetchUserData({ userId, token }));
@@ -63,7 +66,10 @@ const UserWidget = ({ userId, picturePath }) => {
             >
               {firstName} {lastName}
             </Typography>
-            <Typography>{friends?.length} friends</Typography>
+            <Typography>
+              {isMyUserWidget ? loggedInUser.friends.length : friends.length}
+              {' '}friends
+            </Typography>
           </Box>
         </FlexBetweenBox>
         <ManageAccountsOutlined

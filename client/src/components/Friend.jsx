@@ -24,7 +24,7 @@ const Friend = ({ friendId, name, subtitle, userPicturePath }) => {
   };
 
   return (
-    <FlexBetweenBox>
+    <FlexBetweenBox width='100%'>
       <FlexBetweenBox gap="10px">
         <UserImage image={userPicturePath} size="55px" navigate={onNavigate} />
         <Box>
@@ -44,9 +44,9 @@ const Friend = ({ friendId, name, subtitle, userPicturePath }) => {
       {!isMyPost && (
         <IconButton onClick={onPatchFriend}>
           {isFriend ? (
-            <PersonRemoveOutlined sx={{ color: palette.primary.main }} />
+            <PersonRemoveOutlined  sx={{ color: palette.primary.main, width: '25px', height: '25px' }} />
           ) : (
-            <PersonAddOutlined sx={{ color: palette.primary.main }} />
+            <PersonAddOutlined  sx={{ color: palette.primary.main, width: '25px', height: '25px' }} />
           )}
         </IconButton>
       )}

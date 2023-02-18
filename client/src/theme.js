@@ -14,6 +14,7 @@ export const themeSettings = (mode) => {
               default: "#03001C",
               alt: "#160d2e",
               light: "#150826",
+              navbar: "#06010e",
             },
             text: {
               primary: "#fff",
@@ -27,6 +28,9 @@ export const themeSettings = (mode) => {
               background: "#221646",
               foreground: "#392c61",
             },
+            boxShadow: {
+              default: '#4a078098'
+            }
           }
         : {
             // palette values for light mode
@@ -37,7 +41,8 @@ export const themeSettings = (mode) => {
             background: {
               default: "#E6FFF7",
               alt: "#e8eaf6",
-              light: "#90d4b7",
+              light: "#a0d8c0",
+              navbar: "#d0f1e2",
             },
             text: {
               primary: "#000",
@@ -51,6 +56,9 @@ export const themeSettings = (mode) => {
               background: "#debeec",
               foreground: "#E6FFF7",
             },
+            boxShadow: {
+              default: '#0568458e'
+            }
           }),
     },
     typography: {

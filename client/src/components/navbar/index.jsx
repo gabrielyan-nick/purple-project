@@ -28,10 +28,10 @@ const Navbar = () => {
   const isNonMobileScreens = useMediaQuery("(min-width: 1000px)");
   const menuRef = useRef(null);
 
-  const theme = useTheme();
-  const background = theme.palette.background.default;
-  const altBackground = theme.palette.background.alt;
-  const primaryColor = theme.palette.primary.main;
+  const { palette } = useTheme();
+  const background = palette.background.default;
+  const altBackground = palette.background.alt;
+  const primaryColor = palette.primary.main;
   const fullName = `${user.firstName} ${user.lastName}`;
 
   useOnClickOutside(menuRef, () => setIsMobileMenuOpen(false));
@@ -46,7 +46,16 @@ const Navbar = () => {
   };
 
   return (
-    <FlexBetweenBox padding="10px 50px">
+    <FlexBetweenBox
+      padding="10px 50px"
+      sx={{
+        position: "sticky",
+        top: 0,
+        zIndex: 100,
+        backgroundColor: palette.background.navbar,
+        boxShadow: `0 0 6px 0 ${palette.boxShadow.default}`
+      }}
+    >
       <FlexBetweenBox gap="50px">
         {mode === "light" ? (
           <LightLogo onClick={() => navigate("/home")} pointer="pointer" />
@@ -114,7 +123,7 @@ const Navbar = () => {
           }`}
           ref={menuRef}
           sx={{
-            background: theme.palette.background.light,
+            background: palette.background.light,
             p: "0 10px",
           }}
         >

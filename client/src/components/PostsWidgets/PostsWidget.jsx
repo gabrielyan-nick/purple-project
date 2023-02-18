@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchPosts, fetchUserPosts } from "./postsWidgetSlice";
-import { PostWidget } from "../index";
+import { fetchPosts, fetchUserPosts } from "./postsWidgetsSlice";
+import { PostWidgetMemo } from "../index";
 
 const PostsWidget = ({ userId, isProfile = false }) => {
   const dispatch = useDispatch();
@@ -30,7 +30,7 @@ const PostsWidget = ({ userId, isProfile = false }) => {
           comments,
           createdAt,
         }) => (
-          <PostWidget
+          <PostWidgetMemo
             key={_id}
             postId={_id}
             postUserId={userId}

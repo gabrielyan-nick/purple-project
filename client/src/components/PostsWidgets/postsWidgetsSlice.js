@@ -48,6 +48,21 @@ export const addMyPost = createAsyncThunk(
   }
 );
 
+export const deletePost = createAsyncThunk(
+  "posts/deletePost",
+  async ({ postId, token }) => {
+    const response = await fetch(`http://localhost:3001/posts/${postId}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    const posts = await response.json();
+    if (posts.message) return [];
+    return posts;
+  }
+);
+
 export const addComment = createAsyncThunk(
   "posts/addComment",
   async ({ postId, data, token }) => {
@@ -60,6 +75,24 @@ export const addComment = createAsyncThunk(
           "Content-Type": "application/json",
         },
         body: JSON.stringify(data),
+      }
+    );
+    const post = await response.json();
+    if (post.message) return [];
+    return post;
+  }
+);
+
+export const deleteComment = createAsyncThunk(
+  "posts/deleteComment",
+  async ({ postId, commentId, token }) => {
+    const response = await fetch(
+      `http://localhost:3001/posts/${postId}/comment/${commentId}`,
+      {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       }
     );
     const post = await response.json();
@@ -113,6 +146,9 @@ const postsWidgetSlice = createSlice({
       .addCase(addMyPost.fulfilled, (state, action) => {
         state.posts = action.payload;
       })
+      .addCase(deletePost.fulfilled, (state, action) => {
+        state.posts = action.payload;
+      })
       .addCase(patchLike.fulfilled, (state, action) => {
         const updatedPosts = state.posts.map((post) => {
           if (post._id === action.payload._id) return action.payload;
@@ -121,6 +157,13 @@ const postsWidgetSlice = createSlice({
         state.posts = updatedPosts;
       })
       .addCase(addComment.fulfilled, (state, action) => {
+        const updatedPosts = state.posts.map((post) => {
+          if (post._id === action.payload._id) return action.payload;
+          return post;
+        });
+        state.posts = updatedPosts;
+      })
+      .addCase(deleteComment.fulfilled, (state, action) => {
         const updatedPosts = state.posts.map((post) => {
           if (post._id === action.payload._id) return action.payload;
           return post;

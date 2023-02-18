@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { CommentSchema } from "./Comment.js";
 
 const PostSchema = new mongoose.Schema(
   {
@@ -19,7 +20,7 @@ const PostSchema = new mongoose.Schema(
     picturePath: String,
     userPicturePath: String,
     likes: { type: Map, of: Boolean },
-    comments: { type: Array, default: [] },
+    comments: { type: Array, of: CommentSchema, default: [] },
   },
   { timestamps: true }
 );
