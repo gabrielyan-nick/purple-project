@@ -1,4 +1,4 @@
-import { React, useState, useRef } from "react";
+import { React, useState, useRef, useEffect } from "react";
 import {
   Box,
   IconButton,
@@ -34,6 +34,18 @@ const Navbar = () => {
   const primaryColor = palette.primary.main;
   const fullName = `${user.firstName} ${user.lastName}`;
 
+  useEffect(() => {
+    !isMobileMenuOpen ? changeBtnsTabIndex("-1") : changeBtnsTabIndex("0");
+  }, [isMobileMenuOpen]);
+
+  const changeBtnsTabIndex = (i) => {
+    document
+      .querySelectorAll(".mobMenu-ref")
+      .forEach((ref) => ref.setAttribute("tabindex", i));
+    const selectRef = document.querySelector(".mobMenu-ref-select");
+    selectRef.querySelector("div").setAttribute("tabindex", i);
+  };
+
   useOnClickOutside(menuRef, () => setIsMobileMenuOpen(false));
 
   const onSetMode = () => {
@@ -53,7 +65,7 @@ const Navbar = () => {
         top: 0,
         zIndex: 100,
         backgroundColor: palette.background.navbar,
-        boxShadow: `0 0 6px 0 ${palette.boxShadow.default}`
+        boxShadow: `0 0 6px 0 ${palette.boxShadow.default}`,
       }}
     >
       <FlexBetweenBox gap="50px">
@@ -128,7 +140,10 @@ const Navbar = () => {
           }}
         >
           <Box display="flex" justifyContent="flex-end" p="5px">
-            <IconButton onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+            <IconButton
+              className="mobMenu-ref"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            >
               <Close sx={{ fontSize: "30px", color: primaryColor }} />
             </IconButton>
           </Box>

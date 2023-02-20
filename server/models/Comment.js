@@ -22,6 +22,11 @@ export const CommentSchema = new mongoose.Schema(
       type: String,
       require: true,
     },
+    createdDate: {
+      type: Date,
+      require: true,
+      default: Date.now,
+    },
   },
   { timestamps: true }
 );

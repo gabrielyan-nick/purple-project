@@ -23,6 +23,7 @@ export const themeSettings = (mode) => {
             },
             buttons: {
               main: "#38006b",
+              // hover: 
             },
             skeleton: {
               background: "#221646",

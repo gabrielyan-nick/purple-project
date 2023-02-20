@@ -6,6 +6,7 @@ import {
   addComment,
   deleteComment,
   deletePost,
+  updateComment,
 } from "../controllers/posts.js";
 import { verifyToken } from "../middleware/auth.js";
 
@@ -23,6 +24,9 @@ router.post("/:postId/comment", verifyToken, addComment);
 
 // DELETE COMMENT
 router.delete("/:postId/comment/:commentId", verifyToken, deleteComment);
+
+// UPDATE COMMENT
+router.put("/:postId/comment/:commentId", verifyToken, updateComment);
 
 // DELETE POST
 router.delete("/:postId", verifyToken, deletePost);

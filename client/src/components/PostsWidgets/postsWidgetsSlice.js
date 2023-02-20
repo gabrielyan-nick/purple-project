@@ -101,6 +101,26 @@ export const deleteComment = createAsyncThunk(
   }
 );
 
+export const updateComment = createAsyncThunk(
+  "posts/updateComment",
+  async ({ postId, commentId, data, token }) => {
+    const response = await fetch(
+      `http://localhost:3001/posts/${postId}/comment/${commentId}`,
+      {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      }
+    );
+    const post = await response.json();
+    if (post.message) return [];
+    return post;
+  }
+);
+
 export const patchLike = createAsyncThunk(
   "posts/patchLike",
   async ({ postId, token, loggedInUserId }) => {
@@ -164,6 +184,13 @@ const postsWidgetSlice = createSlice({
         state.posts = updatedPosts;
       })
       .addCase(deleteComment.fulfilled, (state, action) => {
+        const updatedPosts = state.posts.map((post) => {
+          if (post._id === action.payload._id) return action.payload;
+          return post;
+        });
+        state.posts = updatedPosts;
+      })
+      .addCase(updateComment.fulfilled, (state, action) => {
         const updatedPosts = state.posts.map((post) => {
           if (post._id === action.payload._id) return action.payload;
           return post;

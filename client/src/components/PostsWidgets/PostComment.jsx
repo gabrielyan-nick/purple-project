@@ -1,11 +1,18 @@
-import React from "react";
-import { Box, Divider, IconButton, Typography, Button } from "@mui/material";
-import { Close } from "@mui/icons-material";
+import React, { useState, useRef, useEffect } from "react";
+import {
+  Box,
+  Divider,
+  IconButton,
+  Typography,
+  Button,
+  InputBase,
+} from "@mui/material";
+import { Close, Edit, Save } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { useTheme } from "@emotion/react";
 import { UserImage, FlexBetweenBox } from "../index";
-import { deleteComment } from "./postsWidgetsSlice";
+import { deleteComment, updateComment } from "./postsWidgetsSlice";
 
 export const PostComment = ({
   commentId,
@@ -15,7 +22,10 @@ export const PostComment = ({
   userPicturePath,
   text,
   createdAt,
+  changeEditingComment,
 }) => {
+  const [editedText, setEditedText] = useState(text);
+  const [isEditing, setIsEditing] = useState(false);
   const token = useSelector((state) => state.auth.token);
   const loggedInUserId = useSelector((state) => state.auth.user._id);
   const dispatch = useDispatch();
@@ -25,9 +35,34 @@ export const PostComment = ({
     .toLocaleString()
     .slice(0, -3);
   const isMyComment = loggedInUserId === userId;
+  const inputRef = useRef(null);
 
   const onDelComment = () => {
     dispatch(deleteComment({ postId, commentId, token }));
+  };
+
+  useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.focus();
+      inputRef.current.setSelectionRange(
+        inputRef.current.value.length,
+        inputRef.current.value.length
+      );
+    }
+  }, [isEditing]);
+
+  const onEditComment = () => {
+    setIsEditing(true);
+    changeEditingComment(true);
+  };
+
+  const onSaveEditedComment = () => {
+    const data = {
+      text: editedText,
+    };
+    dispatch(updateComment({ postId, commentId, data, token }));
+    setIsEditing(false);
+    changeEditingComment(false);
   };
 
   const onNavigate = () => {
@@ -36,7 +71,7 @@ export const PostComment = ({
   };
 
   return (
-    <Box>
+    <Box mb="10px">
       <Divider />
       <FlexBetweenBox mt="7px" gap="10px">
         <Box
@@ -63,18 +98,63 @@ export const PostComment = ({
             </Typography>
           </Box>
         </Box>
-        {isMyComment && (
+        {isMyComment && !isEditing ? (
+          <Box>
+            <IconButton
+              size="small"
+              sx={{
+                marginTop: "-20px",
+                "&:hover": { color: palette.primary.main, cursor: "pointer" },
+              }}
+              onClick={onEditComment}
+            >
+              <Edit />
+            </IconButton>
+            <IconButton
+              size="small"
+              sx={{
+                margin: "-20px -5px 0",
+                "&:hover": { color: palette.primary.main, cursor: "pointer" },
+              }}
+              onClick={onDelComment}
+            >
+              <Close />
+            </IconButton>
+          </Box>
+        ) : isMyComment && isEditing ? (
           <IconButton
+            size="small"
             sx={{
+              margin: "-20px -5px 0",
               "&:hover": { color: palette.primary.main, cursor: "pointer" },
             }}
-            onClick={onDelComment}
+            onClick={onSaveEditedComment}
           >
-            <Close />
+            <Save />
           </IconButton>
-        )}
+        ) : null}
       </FlexBetweenBox>
-      <Typography m="5px 0 10px 60px">{text}</Typography>
+      {isMyComment && isEditing ? (
+        <InputBase
+          inputRef={inputRef}
+          onChange={(e) => setEditedText(e.target.value)}
+          value={editedText}
+          multiline
+          sx={{
+            width: "90%",
+            backgroundColor: "transparent",
+            marginLeft: "45px",
+            paddingLeft: "10px",
+            lineHeight: 1.5,
+            borderRadius: "15px",
+            boxShadow: `0px 0px 6px ${palette.primary.main}`,
+          }}
+        />
+      ) : (
+        <Typography p="5px 0 0 55px" sx={{ wordWrap: "break-word" }}>
+          {text}
+        </Typography>
+      )}
     </Box>
   );
 };

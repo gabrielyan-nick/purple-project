@@ -32,6 +32,7 @@ const PostWidget = ({
 }) => {
   const [isComments, setIsComments] = useState(false);
   const [comment, setComment] = useState("");
+  const [isEditingComment, setIsEditingComment] = useState(false);
   const dispatch = useDispatch();
   const token = useSelector((state) => state.auth.token);
   const loggedInUserId = useSelector((state) => state.auth.user._id);
@@ -59,6 +60,10 @@ const PostWidget = ({
     dispatch(addComment({ postId, data, token })).then(() => setComment(""));
   };
 
+  const changeEditingComment = (value) => {
+    setIsEditingComment(value);
+  };
+
   return (
     <WidgetWrapper m="10px 0">
       <FlexBetweenBox>
@@ -70,8 +75,10 @@ const PostWidget = ({
         />
         {isMyPost && (
           <IconButton
+            size="small"
             sx={{
-              alignSelf: 'flex-start',
+              alignSelf: "flex-start",
+              margin: "-10px -5px 0",
               "&:hover": { color: palette.primary.main, cursor: "pointer" },
             }}
             onClick={onDelPost}
@@ -99,10 +106,10 @@ const PostWidget = ({
           }}
         />
       )}
-      <FlexBetweenBox mt="7px">
+      <FlexBetweenBox m="7px 0 5px">
         <FlexBetweenBox gap="10px">
           <FlexBetweenBox gap="5px">
-            <IconButton onClick={onPatchLike}>
+            <IconButton size="small" onClick={onPatchLike}>
               {isLiked ? (
                 <FavoriteOutlined sx={{ color: palette.primary.main }} />
               ) : (
@@ -113,14 +120,14 @@ const PostWidget = ({
           </FlexBetweenBox>
 
           <FlexBetweenBox gap="5px">
-            <IconButton onClick={() => setIsComments(!isComments)}>
+            <IconButton size="small" onClick={() => setIsComments(!isComments)}>
               <ChatBubbleOutlineOutlined />
             </IconButton>
             <Typography>{comments.length}</Typography>
           </FlexBetweenBox>
         </FlexBetweenBox>
 
-        <IconButton>
+        <IconButton size="small" sx={{ marginRight: "-5px" }}>
           <ShareOutlined sx={{ color: palette.primary.main }} />
         </IconButton>
       </FlexBetweenBox>
@@ -135,49 +142,51 @@ const PostWidget = ({
               lastName,
               userPicturePath,
               text,
-              createdAt,
+              createdDate,
             }) => (
               <PostCommentMemo
-                key={userId}
+                key={_id}
                 postId={postId}
                 commentId={_id}
                 name={`${firstName} ${lastName}`}
                 userId={userId}
                 text={text}
                 userPicturePath={userPicturePath}
-                createdAt={createdAt}
+                createdAt={createdDate}
+                changeEditingComment={changeEditingComment}
               />
             )
           )}
-
-          <FlexBetweenBox gap="10px" m="15px 0 5px 0">
-            <InputBase
-              placeholder="Add comment"
-              onChange={(e) => setComment(e.target.value)}
-              value={comment}
-              multiline
-              sx={{
-                width: "100%",
-                backgroundColor: "transparent",
-                borderRadius: "15px",
-                padding: "10px",
-                boxShadow: `0px 0px 6px ${palette.primary.main}`,
-              }}
-            />
-            <Button
-              variant="contained"
-              disabled={!comment}
-              onClick={onAddComment}
-              sx={{
-                backgroundColor: palette.buttons.main,
-                borderRadius: "5px",
-                color: "#fff",
-                width: "15%",
-              }}
-            >
-              Post
-            </Button>
-          </FlexBetweenBox>
+          {!isEditingComment && (
+            <FlexBetweenBox gap="10px" m="20px 0 5px 0">
+              <InputBase
+                placeholder="Add comment"
+                onChange={(e) => setComment(e.target.value)}
+                value={comment}
+                multiline
+                sx={{
+                  width: "100%",
+                  backgroundColor: "transparent",
+                  borderRadius: "15px",
+                  padding: "10px",
+                  boxShadow: `0px 0px 6px ${palette.primary.main}`,
+                }}
+              />
+              <Button
+                variant="contained"
+                disabled={!comment}
+                onClick={onAddComment}
+                sx={{
+                  backgroundColor: palette.buttons.main,
+                  borderRadius: "5px",
+                  color: "#fff",
+                  width: "15%",
+                }}
+              >
+                Post
+              </Button>
+            </FlexBetweenBox>
+          )}
         </Box>
       )}
     </WidgetWrapper>

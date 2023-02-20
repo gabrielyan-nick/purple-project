@@ -27,29 +27,36 @@ const NavbarToolkit = ({ setMode, setLogout, fullName, direction = "row" }) => {
   return (
     <FlexBetweenBox gap="10px" sx={{ flexDirection: direction }}>
       <FlexBetweenBox gap="10px">
-        <IconButton onClick={setMode}>
+        <IconButton
+          className={`${direction === "column" ? "mobMenu-ref" : ""}`}
+          onClick={setMode}
+        >
           {theme.palette.mode === "dark" ? (
             <DarkMode sx={{ fontSize: "25px" }} />
           ) : (
             <LightMode sx={{ color: "#FF7E00", fontSize: "25px" }} />
           )}
         </IconButton>
-        <IconButton>
+        <IconButton
+          className={`${direction === "column" ? "mobMenu-ref" : ""}`}
+        >
           <Message sx={{ color: primaryColor, fontSize: "25px" }} />
         </IconButton>
-        <IconButton>
+        <IconButton
+          className={`${direction === "column" ? "mobMenu-ref" : ""}`}
+        >
           <Notifications sx={{ color: primaryColor, fontSize: "25px" }} />
         </IconButton>
-        <IconButton>
+        <IconButton
+          className={`${direction === "column" ? "mobMenu-ref" : ""}`}
+        >
           <Help sx={{ color: primaryColor, fontSize: "25px" }} />
         </IconButton>
       </FlexBetweenBox>
 
-      <FormControl
-        variant="standard"
-        value={fullName}
-      >
+      <FormControl variant="standard" value={fullName}>
         <Select
+          className={`${direction === "column" ? "mobMenu-ref-select" : ""}`}
           value={fullName}
           sx={{
             backgroundColor: `${
@@ -72,7 +79,7 @@ const NavbarToolkit = ({ setMode, setLogout, fullName, direction = "row" }) => {
               }`,
             },
           }}
-          input={<InputBase />}
+          input={<InputBase  className={`${direction === "column" ? "mobMenu-ref" : ""}`}/>}
         >
           <MenuItem value={fullName}>
             <Typography>{fullName}</Typography>

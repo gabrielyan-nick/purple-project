@@ -67,13 +67,35 @@ export const addComment = async (req, res) => {
 export const deleteComment = async (req, res) => {
   try {
     const { postId, commentId } = req.params;
+    await Comment.findByIdAndDelete(commentId);
     const post = await Post.findById(postId);
+    post.comments.pull(commentId);
+    await post.save();
+    res.status(200).json(post);
+  } catch (error) {
+    res.status(409).json({ message: error.message });
+  }
+};
 
-    const comment = post.comments.id(commentId);
-    comment.remove();
-
-    const updatedPost = await post.save();
-    res.status(200).json(updatedPost);
+export const updateComment = async (req, res) => {
+  try {
+    const { postId, commentId } = req.params;
+    const { text } = req.body;
+    const updatedComment = await Comment.findByIdAndUpdate(
+      commentId,
+      { text },
+      { new: true }
+    );
+    const updatedPost = await Post.findById(postId);
+    const updatedComments = updatedPost.comments.map((comment) =>
+      comment._id == commentId ? updatedComment : comment
+    );
+    const post = await Post.findByIdAndUpdate(
+      postId,
+      { comments: updatedComments },
+      { new: true }
+    );
+    res.status(200).json(post);
   } catch (error) {
     res.status(409).json({ message: error.message });
   }
