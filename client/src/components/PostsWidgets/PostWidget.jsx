@@ -181,6 +181,7 @@ const PostWidget = ({
                   borderRadius: "5px",
                   color: "#fff",
                   width: "15%",
+                  "&:hover": {backgroundColor: palette.buttons.main,}
                 }}
               >
                 Post

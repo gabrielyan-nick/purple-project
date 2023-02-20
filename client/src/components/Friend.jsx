@@ -1,11 +1,19 @@
+import React, { useState } from "react";
 import { PersonAddOutlined, PersonRemoveOutlined } from "@mui/icons-material";
-import { Box, IconButton, Typography, useTheme } from "@mui/material";
+import {
+  Box,
+  IconButton,
+  Typography,
+  useTheme,
+  CircularProgress,
+} from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { FlexBetweenBox, UserImage } from "./index";
 import { patchFriend } from "./../store/index";
 
 const Friend = ({ friendId, name, subtitle, userPicturePath }) => {
+  const [patchFriendStatus, setPatchFriendStatus] = useState("idle");
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const token = useSelector((state) => state.auth.token);
@@ -15,7 +23,10 @@ const Friend = ({ friendId, name, subtitle, userPicturePath }) => {
   const isMyPost = _id === friendId;
 
   const onPatchFriend = () => {
-    dispatch(patchFriend({ _id, friendId, token }));
+    setPatchFriendStatus("loading");
+    dispatch(patchFriend({ _id, friendId, token })).then(() =>
+      setPatchFriendStatus("idle")
+    );
   };
 
   const onNavigate = () => {
@@ -24,7 +35,7 @@ const Friend = ({ friendId, name, subtitle, userPicturePath }) => {
   };
 
   return (
-    <FlexBetweenBox width='100%'>
+    <FlexBetweenBox width="100%">
       <FlexBetweenBox gap="10px">
         <UserImage image={userPicturePath} size="55px" navigate={onNavigate} />
         <Box>
@@ -43,10 +54,24 @@ const Friend = ({ friendId, name, subtitle, userPicturePath }) => {
       </FlexBetweenBox>
       {!isMyPost && (
         <IconButton onClick={onPatchFriend}>
-          {isFriend ? (
-            <PersonRemoveOutlined  sx={{ color: palette.primary.main, width: '25px', height: '25px' }} />
+          {isFriend && patchFriendStatus === "idle" ? (
+            <PersonRemoveOutlined
+              sx={{
+                color: palette.primary.main,
+                width: "25px",
+                height: "25px",
+              }}
+            />
+          ) : !isFriend && patchFriendStatus === "idle" ? (
+            <PersonAddOutlined
+              sx={{
+                color: palette.primary.main,
+                width: "25px",
+                height: "25px",
+              }}
+            />
           ) : (
-            <PersonAddOutlined  sx={{ color: palette.primary.main, width: '25px', height: '25px' }} />
+            <CircularProgress size={26}/>
           )}
         </IconButton>
       )}

@@ -22,6 +22,10 @@ export const CommentSchema = new mongoose.Schema(
       type: String,
       require: true,
     },
+    postId: {
+      type: String,
+      require: true,
+    },
     createdDate: {
       type: Date,
       require: true,

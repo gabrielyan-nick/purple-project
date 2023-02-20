@@ -30,6 +30,7 @@ export const deletePost = async (req, res) => {
   try {
     const { postId } = req.params;
     await Post.findByIdAndDelete(postId);
+    await Comment.deleteMany({ postId });
     const posts = await Post.find().sort({ createdAt: -1 });
     res.status(200).json(posts);
   } catch (error) {
@@ -50,6 +51,7 @@ export const addComment = async (req, res) => {
       lastName: user.lastName,
       userPicturePath: user.picturePath,
       text,
+      postId,
     });
     await newComment.save();
     post.comments.push(newComment);
