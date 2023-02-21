@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchPosts, fetchUserPosts } from "./postsWidgetsSlice";
 import { PostWidgetMemo } from "../index";
+import { Box } from "@mui/system";
 
 const PostsWidget = ({ userId, isProfile = false }) => {
   const dispatch = useDispatch();
@@ -15,7 +16,7 @@ const PostsWidget = ({ userId, isProfile = false }) => {
   }, []);
 
   return (
-    <>
+    <Box display='flex' flexDirection='column' gap='20px'>
       {posts.map(
         ({
           _id,
@@ -45,7 +46,7 @@ const PostsWidget = ({ userId, isProfile = false }) => {
           />
         )
       )}
-    </>
+    </Box>
   );
 };
 

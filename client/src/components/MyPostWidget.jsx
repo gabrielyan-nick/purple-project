@@ -65,7 +65,7 @@ const MyPostWidget = ({ picturePath }) => {
   };
 
   return (
-    <WidgetWrapper>
+    <WidgetWrapper sx={{marginBottom: '20px'}}>
       <FlexBetweenBox gap="15px">
         <UserImage image={picturePath} navigate={onNavigate} />
         <InputBase

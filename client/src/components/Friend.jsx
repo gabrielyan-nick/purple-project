@@ -12,26 +12,35 @@ import { useNavigate } from "react-router-dom";
 import { FlexBetweenBox, UserImage } from "./index";
 import { patchFriend } from "./../store/index";
 
-const Friend = ({ friendId, name, subtitle, userPicturePath }) => {
+const Friend = ({
+  friendId,
+  name,
+  subtitle,
+  userPicturePath,
+  isInProfilePage,
+}) => {
   const [patchFriendStatus, setPatchFriendStatus] = useState("idle");
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const token = useSelector((state) => state.auth.token);
   const { friends, _id } = useSelector((state) => state.auth.user);
+  const { friendList } = useSelector((state) => state.friendListWidget);
+  const currentFriends = isInProfilePage ? friendList : friends;
   const { palette } = useTheme();
-  const isFriend = friends.find((friend) => friend._id === friendId);
+  const isFriend = currentFriends.find((friend) => friend._id === friendId);
   const isMyPost = _id === friendId;
-
+console.log(isInProfilePage)
   const onPatchFriend = () => {
     setPatchFriendStatus("loading");
-    dispatch(patchFriend({ _id, friendId, token })).then(() =>
-      setPatchFriendStatus("idle")
-    );
+    dispatch(patchFriend({ _id, friendId, token })).then(() => {
+      setPatchFriendStatus("idle");
+      // navigate(0);
+    });
   };
 
   const onNavigate = () => {
     navigate(`/profile/${friendId}`);
-    // navigate(0);
+    navigate(0);
   };
 
   return (
@@ -71,7 +80,7 @@ const Friend = ({ friendId, name, subtitle, userPicturePath }) => {
               }}
             />
           ) : (
-            <CircularProgress size={26}/>
+            <CircularProgress size={26} />
           )}
         </IconButton>
       )}

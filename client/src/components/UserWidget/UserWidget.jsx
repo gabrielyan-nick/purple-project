@@ -67,14 +67,16 @@ const UserWidget = ({ userId, picturePath }) => {
               {firstName} {lastName}
             </Typography>
             <Typography>
-              {isMyUserWidget ? loggedInUser.friends.length : friends.length}
-              {' '}friends
+              {isMyUserWidget ? loggedInUser.friends.length : friends.length}{" "}
+              friends
             </Typography>
           </Box>
         </FlexBetweenBox>
-        <ManageAccountsOutlined
-          sx={{ color: palette.primary.main, cursor: "pointer" }}
-        />
+        {isMyUserWidget && (
+          <ManageAccountsOutlined
+            sx={{ color: palette.primary.main, cursor: "pointer" }}
+          />
+        )}
       </FlexBetweenBox>
       <Divider />
       {/* SECOND ROW */}

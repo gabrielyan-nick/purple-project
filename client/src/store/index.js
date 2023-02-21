@@ -25,6 +25,24 @@ export const patchFriend = createAsyncThunk(
   }
 );
 
+export const getMyFriendList = createAsyncThunk(
+  "user/getMyFriendList",
+  async ({ userId, token }) => {
+    const response = await fetch(
+      `http://localhost:3001/users/${userId}/friends`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    const friends = await response.json();
+    if (friends.message) return [];
+    return friends;
+  }
+);
+
 const authSlice = createSlice({
   name: "auth",
   initialState,
@@ -42,13 +60,17 @@ const authSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(patchFriend.fulfilled, (state, action) => {
-      if (state.user) {
+    builder
+      .addCase(patchFriend.fulfilled, (state, action) => {
+        if (state.user) {
+          state.user.friends = action.payload;
+        } else {
+          console.error("There are no friends :(");
+        }
+      })
+      .addCase(getMyFriendList.fulfilled, (state, action) => {
         state.user.friends = action.payload;
-      } else {
-        console.error("There are no friends :(");
-      }
-    });
+      });
   },
 });
 

@@ -10,4 +10,5 @@ export { default as MyPostWidget } from "./MyPostWidget";
 export { PostWidgetMemo } from "./PostsWidgets/PostWidget";
 export { default as PostsWidget } from "./PostsWidgets/PostsWidget";
 export { default as Friend } from "./Friend";
+export { default as FriendListWidget } from "./FriendListWidget/FriendListWidget";
 export { PostCommentMemo } from "./PostsWidgets/PostComment";

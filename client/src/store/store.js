@@ -17,6 +17,7 @@ import storage from "redux-persist/lib/storage";
 import authReducer from "./index.js";
 import userWidgetReducer from "../components/UserWidget/userWidgetSlice";
 import postsWidgetReducer from "../components/PostsWidgets/postsWidgetsSlice";
+import friendListWidgetReducer from "components/FriendListWidget/friendListWidgetSlice.js";
 
 const persistConfig = {
   key: "root",
@@ -28,6 +29,7 @@ const rootReducer = combineReducers({
   auth: authReducer,
   userWidget: userWidgetReducer,
   postsWidget: postsWidgetReducer,
+  friendListWidget: friendListWidgetReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

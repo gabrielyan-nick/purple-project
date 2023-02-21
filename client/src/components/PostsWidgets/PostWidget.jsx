@@ -65,7 +65,7 @@ const PostWidget = ({
   };
 
   return (
-    <WidgetWrapper m="10px 0">
+    <WidgetWrapper>
       <FlexBetweenBox>
         <Friend
           friendId={postUserId}

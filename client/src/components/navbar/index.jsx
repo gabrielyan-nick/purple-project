@@ -70,9 +70,9 @@ const Navbar = () => {
     >
       <FlexBetweenBox gap="50px">
         {mode === "light" ? (
-          <LightLogo onClick={() => navigate("/home")} pointer="pointer" />
+          <LightLogo  navigate={() => navigate("/home")} pointer="pointer" />
         ) : (
-          <DarkLogo onClick={() => navigate("/home")} pointer="pointer" />
+          <DarkLogo  navigate={() => navigate("/home")} pointer="pointer" />
         )}
 
         {isNonMobileScreens && (

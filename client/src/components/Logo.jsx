@@ -1,6 +1,6 @@
 import React from "react";
 
-export const LightLogo = ({ pointer = "default" }) => {
+export const LightLogo = ({navigate, pointer = "default" }) => {
   return (
     <svg
       style={{ cursor: pointer }}
@@ -10,6 +10,7 @@ export const LightLogo = ({ pointer = "default" }) => {
       xmlnssvgjs="http://svgjs.dev/svgjs"
       width="200"
       viewBox="0 0 2000 469"
+      onClick={navigate}
     >
       <g transform="matrix(1,0,0,1,-1.2120977385694687,0.6499780518880982)">
         <svg
@@ -134,7 +135,7 @@ export const LightLogo = ({ pointer = "default" }) => {
   );
 };
 
-export const DarkLogo = ({ pointer = "default" }) => {
+export const DarkLogo = ({navigate, pointer = "default" }) => {
   return (
     <svg
       style={{ cursor: pointer }}
@@ -145,6 +146,7 @@ export const DarkLogo = ({ pointer = "default" }) => {
       width="200"
       // height="469"
       viewBox="0 0 2000 469"
+      onClick={navigate}
     >
       <g transform="matrix(1,0,0,1,-1.2120977385694687,0.6499780518880982)">
         <svg
