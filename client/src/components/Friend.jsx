@@ -11,13 +11,14 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { FlexBetweenBox, UserImage } from "./index";
 import { patchFriend } from "./../store/index";
+import { setListFix } from "./FriendListWidget/friendListWidgetSlice";
 
 const Friend = ({
   friendId,
   name,
   subtitle,
   userPicturePath,
-  isInProfilePage,
+  isInProfilePage = false,
 }) => {
   const [patchFriendStatus, setPatchFriendStatus] = useState("idle");
   const dispatch = useDispatch();
@@ -29,11 +30,12 @@ const Friend = ({
   const { palette } = useTheme();
   const isFriend = currentFriends.find((friend) => friend._id === friendId);
   const isMyPost = _id === friendId;
-console.log(isInProfilePage)
+
   const onPatchFriend = () => {
     setPatchFriendStatus("loading");
     dispatch(patchFriend({ _id, friendId, token })).then(() => {
       setPatchFriendStatus("idle");
+      dispatch(setListFix());
       // navigate(0);
     });
   };

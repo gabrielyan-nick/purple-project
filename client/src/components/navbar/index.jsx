@@ -27,7 +27,6 @@ const Navbar = () => {
   const { user, mode } = useSelector((state) => state.auth);
   const isNonMobileScreens = useMediaQuery("(min-width: 1000px)");
   const menuRef = useRef(null);
-
   const { palette } = useTheme();
   const background = palette.background.default;
   const altBackground = palette.background.alt;

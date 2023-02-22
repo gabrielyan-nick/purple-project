@@ -12,7 +12,7 @@ export const themeSettings = (mode) => {
             },
             background: {
               default: "#03001C",
-              alt: "#160d2e",
+              alt: "#150c2c",
               light: "#150826",
               navbar: "#06010e",
             },

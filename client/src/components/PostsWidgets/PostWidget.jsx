@@ -12,6 +12,7 @@ import {
   Friend,
   WidgetWrapper,
   PostCommentMemo,
+  PhotoModal,
 } from "../index";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -33,6 +34,7 @@ const PostWidget = ({
   const [isComments, setIsComments] = useState(false);
   const [comment, setComment] = useState("");
   const [isEditingComment, setIsEditingComment] = useState(false);
+  const [isPhotoModalOpen, setIsPhotoModalOpen] = useState(false);
   const dispatch = useDispatch();
   const token = useSelector((state) => state.auth.token);
   const loggedInUserId = useSelector((state) => state.auth.user._id);
@@ -64,133 +66,146 @@ const PostWidget = ({
     setIsEditingComment(value);
   };
 
+  const openPhotoModal = () => setIsPhotoModalOpen(true);
+  const closePhotoModal = () => setIsPhotoModalOpen(false);
+
   return (
-    <WidgetWrapper>
-      <FlexBetweenBox>
-        <Friend
-          friendId={postUserId}
-          name={name}
-          subtitle={location}
-          userPicturePath={userPicturePath}
-        />
-        {isMyPost && (
-          <IconButton
-            size="small"
-            sx={{
-              alignSelf: "flex-start",
-              margin: "-10px -5px 0",
-              "&:hover": { color: palette.primary.main, cursor: "pointer" },
-            }}
-            onClick={onDelPost}
-          >
-            <Close />
-          </IconButton>
-        )}
-      </FlexBetweenBox>
-
-      <Typography mt="5px" variant="subtitle2" color="grey">
-        {postCreatedTime}
-      </Typography>
-      <Typography fontWeight="500" mt="5px">
-        {description}
-      </Typography>
-      {picturePath && (
-        <img
-          src={`http://localhost:3001/assets/${picturePath}`}
-          alt="post"
-          style={{
-            width: "100%",
-            height: "auto",
-            borderRadius: "5px",
-            marginTop: "10px",
-          }}
-        />
-      )}
-      <FlexBetweenBox m="7px 0 5px">
-        <FlexBetweenBox gap="10px">
-          <FlexBetweenBox gap="5px">
-            <IconButton size="small" onClick={onPatchLike}>
-              {isLiked ? (
-                <FavoriteOutlined sx={{ color: palette.primary.main }} />
-              ) : (
-                <FavoriteBorderOutlined />
-              )}
+    <>
+      <WidgetWrapper>
+        <FlexBetweenBox>
+          <Friend
+            friendId={postUserId}
+            name={name}
+            subtitle={location}
+            userPicturePath={userPicturePath}
+          />
+          {isMyPost && (
+            <IconButton
+              size="small"
+              sx={{
+                alignSelf: "flex-start",
+                margin: "-10px -5px 0",
+                "&:hover": { color: palette.primary.main, cursor: "pointer" },
+              }}
+              onClick={onDelPost}
+            >
+              <Close />
             </IconButton>
-            <Typography>{likesCount}</Typography>
-          </FlexBetweenBox>
-
-          <FlexBetweenBox gap="5px">
-            <IconButton size="small" onClick={() => setIsComments(!isComments)}>
-              <ChatBubbleOutlineOutlined />
-            </IconButton>
-            <Typography>{comments.length}</Typography>
-          </FlexBetweenBox>
+          )}
         </FlexBetweenBox>
 
-        <IconButton size="small" sx={{ marginRight: "-5px" }}>
-          <ShareOutlined sx={{ color: palette.primary.main }} />
-        </IconButton>
-      </FlexBetweenBox>
-
-      {isComments && (
-        <Box>
-          {comments.map(
-            ({
-              _id,
-              userId,
-              firstName,
-              lastName,
-              userPicturePath,
-              text,
-              createdDate,
-            }) => (
-              <PostCommentMemo
-                key={_id}
-                postId={postId}
-                commentId={_id}
-                name={`${firstName} ${lastName}`}
-                userId={userId}
-                text={text}
-                userPicturePath={userPicturePath}
-                createdAt={createdDate}
-                changeEditingComment={changeEditingComment}
-              />
-            )
-          )}
-          {!isEditingComment && (
-            <FlexBetweenBox gap="10px" m="20px 0 5px 0">
-              <InputBase
-                placeholder="Add comment"
-                onChange={(e) => setComment(e.target.value)}
-                value={comment}
-                multiline
-                sx={{
-                  width: "100%",
-                  backgroundColor: "transparent",
-                  borderRadius: "15px",
-                  padding: "10px",
-                  boxShadow: `0px 0px 6px ${palette.primary.main}`,
-                }}
-              />
-              <Button
-                variant="contained"
-                disabled={!comment}
-                onClick={onAddComment}
-                sx={{
-                  backgroundColor: palette.buttons.main,
-                  borderRadius: "5px",
-                  color: "#fff",
-                  width: "15%",
-                  "&:hover": {backgroundColor: palette.buttons.main,}
-                }}
-              >
-                Post
-              </Button>
+        <Typography mt="5px" variant="subtitle2" color="grey">
+          {postCreatedTime}
+        </Typography>
+        <Typography fontWeight="500" mt="5px">
+          {description}
+        </Typography>
+        {picturePath && (
+          <img
+            src={`http://localhost:3001/assets/${picturePath}`}
+            alt="post"
+            style={{
+              width: "100%",
+              height: "auto",
+              borderRadius: "5px",
+              marginTop: "10px",
+              cursor: "pointer",
+            }}
+            onClick={openPhotoModal}
+          />
+        )}
+        <FlexBetweenBox m="7px 0 5px">
+          <FlexBetweenBox gap="10px">
+            <FlexBetweenBox gap="5px">
+              <IconButton size="small" onClick={onPatchLike}>
+                {isLiked ? (
+                  <FavoriteOutlined sx={{ color: palette.primary.main }} />
+                ) : (
+                  <FavoriteBorderOutlined />
+                )}
+              </IconButton>
+              <Typography>{likesCount}</Typography>
             </FlexBetweenBox>
-          )}
-        </Box>
+
+            <FlexBetweenBox gap="5px">
+              <IconButton
+                size="small"
+                onClick={() => setIsComments(!isComments)}
+              >
+                <ChatBubbleOutlineOutlined />
+              </IconButton>
+              <Typography>{comments.length}</Typography>
+            </FlexBetweenBox>
+          </FlexBetweenBox>
+
+          <IconButton size="small" sx={{ marginRight: "-5px" }}>
+            <ShareOutlined sx={{ color: palette.primary.main }} />
+          </IconButton>
+        </FlexBetweenBox>
+
+        {isComments && (
+          <Box>
+            {comments.map(
+              ({
+                _id,
+                userId,
+                firstName,
+                lastName,
+                userPicturePath,
+                text,
+                createdDate,
+              }) => (
+                <PostCommentMemo
+                  key={_id}
+                  postId={postId}
+                  commentId={_id}
+                  name={`${firstName} ${lastName}`}
+                  userId={userId}
+                  text={text}
+                  userPicturePath={userPicturePath}
+                  createdAt={createdDate}
+                  changeEditingComment={changeEditingComment}
+                />
+              )
+            )}
+            {!isEditingComment && (
+              <FlexBetweenBox gap="10px" m="20px 0 5px 0">
+                <InputBase
+                  placeholder="Add comment"
+                  onChange={(e) => setComment(e.target.value)}
+                  value={comment}
+                  multiline
+                  sx={{
+                    width: "100%",
+                    backgroundColor: "transparent",
+                    borderRadius: "15px",
+                    padding: "10px",
+                    boxShadow: `0px 0px 6px ${palette.primary.main}`,
+                  }}
+                />
+                <Button
+                  variant="contained"
+                  disabled={!comment}
+                  onClick={onAddComment}
+                  sx={{
+                    backgroundColor: palette.buttons.main,
+                    borderRadius: "5px",
+                    color: "#fff",
+                    width: "15%",
+                    "&:hover": { backgroundColor: palette.buttons.main },
+                  }}
+                >
+                  Post
+                </Button>
+              </FlexBetweenBox>
+            )}
+          </Box>
+        )}
+      </WidgetWrapper>
+      {isPhotoModalOpen && (
+        <PhotoModal image={picturePath} closeModal={closePhotoModal} />
       )}
-    </WidgetWrapper>
+    </>
   );
 };
 

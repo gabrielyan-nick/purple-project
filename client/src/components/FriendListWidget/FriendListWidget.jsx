@@ -11,7 +11,9 @@ const FriendListWidget = ({ userId, isMyList = true }) => {
   const { palette } = useTheme();
   const token = useSelector((state) => state.auth.token);
   const { friends } = useSelector((state) => state.auth.user);
-  const { friendList } = useSelector((state) => state.friendListWidget);
+  const { friendList, listFixState } = useSelector(
+    (state) => state.friendListWidget
+  );
   const currentFriends = isMyList ? friends : friendList;
   const displayedFriends = showAll
     ? currentFriends
@@ -21,8 +23,7 @@ const FriendListWidget = ({ userId, isMyList = true }) => {
     isMyList
       ? dispatch(getMyFriendList({ userId, token }))
       : dispatch(getFriendList({ userId, token }));
-  }, []);
-
+  }, [listFixState]);
 
   return (
     <WidgetWrapper>
@@ -30,10 +31,13 @@ const FriendListWidget = ({ userId, isMyList = true }) => {
         <Typography variant="h5" fontWeight="500">
           Friend list
         </Typography>
-        <Typography>{`${currentFriends.length} friends`}</Typography>
+        <Typography fontWeight='500'>
+          {currentFriends.length}{" "}
+          {currentFriends.length === 1 ? "friend" : "friends"}
+        </Typography>
       </FlexBetweenBox>
 
-      <Box display="flex" flexDirection="column" gap="10px">
+      <Box display="flex" flexDirection="column" gap="10px" alignItems="center">
         {displayedFriends.map(
           ({ _id, firstName, lastName, location, picturePath }) => (
             <Friend
@@ -45,6 +49,9 @@ const FriendListWidget = ({ userId, isMyList = true }) => {
               isInProfilePage={!isMyList ? true : false}
             />
           )
+        )}
+        {!currentFriends.length && (
+          <Typography py='15px'>No friends. Be the first</Typography>
         )}
       </Box>
 

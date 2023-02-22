@@ -18,7 +18,6 @@ import { FlexBetweenBox, WidgetWrapper, UserImage } from "components";
 import {
   AttachFileOutlined,
   DeleteOutlined,
-  EditOutlined,
   GifBoxOutlined,
   ImageOutlined,
   MicOutlined,
