@@ -10,7 +10,7 @@ export const register = async (req, res) => {
       lastName,
       email,
       password,
-      friends, //
+      friends, 
       picturePath,
       location,
       occupation,
@@ -28,8 +28,6 @@ export const register = async (req, res) => {
       picturePath,
       location,
       occupation,
-      viewedProfile: Math.floor(Math.random() * 10000),
-      impressions: Math.floor(Math.random() * 10000),
     });
     const existingUser = await User.findOne({ email });
     if (existingUser) return res.status(401).json("User already exist");

@@ -10,10 +10,10 @@ const FriendListWidget = ({ userId, isMyList = true }) => {
   const dispatch = useDispatch();
   const { palette } = useTheme();
   const token = useSelector((state) => state.auth.token);
-  const { friends } = useSelector((state) => state.auth.user);
   const { friendList, listFixState } = useSelector(
     (state) => state.friendListWidget
   );
+  const { friends } = useSelector((state) => state.auth.user);
   const currentFriends = isMyList ? friends : friendList;
   const displayedFriends = showAll
     ? currentFriends
@@ -31,7 +31,7 @@ const FriendListWidget = ({ userId, isMyList = true }) => {
         <Typography variant="h5" fontWeight="500">
           Friend list
         </Typography>
-        <Typography fontWeight='500'>
+        <Typography fontWeight="500">
           {currentFriends.length}{" "}
           {currentFriends.length === 1 ? "friend" : "friends"}
         </Typography>
@@ -39,19 +39,22 @@ const FriendListWidget = ({ userId, isMyList = true }) => {
 
       <Box display="flex" flexDirection="column" gap="10px" alignItems="center">
         {displayedFriends.map(
-          ({ _id, firstName, lastName, location, picturePath }) => (
-            <Friend
-              key={_id}
-              friendId={_id}
-              name={`${firstName} ${lastName}`}
-              subtitle={location}
-              userPicturePath={picturePath}
-              isInProfilePage={!isMyList ? true : false}
-            />
-          )
+          ({ _id, firstName, lastName, location, picturePath }) => {
+            if (_id !== undefined)
+              return (
+                <Friend
+                  key={`${_id}`}
+                  friendId={_id}
+                  name={`${firstName} ${lastName}`}
+                  subtitle={location}
+                  userPicturePath={picturePath}
+                  isInProfilePage={!isMyList ? true : false}
+                />
+              );
+          }
         )}
         {!currentFriends.length && (
-          <Typography py='15px'>No friends. Be the first</Typography>
+          <Typography py="15px">No friends. Be the first</Typography>
         )}
       </Box>
 
@@ -70,6 +73,3 @@ const FriendListWidget = ({ userId, isMyList = true }) => {
 };
 
 export default FriendListWidget;
-// Функция вызывается в компоненте Friend при нажатии на кнопку добавить/удалить друга.
-//  Изменение значения listFix вызывает еффект в этом компоненте.
-// Помогает избежать бесконечного цикла при вызова еффекта с зависимостями currentFriends, friendList, friends

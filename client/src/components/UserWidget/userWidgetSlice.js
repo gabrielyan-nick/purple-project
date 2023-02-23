@@ -3,6 +3,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 const initialState = {
   userData: {},
   userLoadingStatus: "idle",
+  userFixState: false, // Меняем переменную при сохранении измененных даных пользователя. При ее изменении запускается эффект для получения данных пользователя.
 };
 
 export const fetchUserData = createAsyncThunk(
@@ -20,7 +21,11 @@ export const fetchUserData = createAsyncThunk(
 const userWidgetSlice = createSlice({
   name: "userWidget",
   initialState,
-  reducers: {},
+  reducers: {
+    setUserFix: (state) => {
+      state.userFixState = !state.userFixState;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchUserData.pending, (state) => {
@@ -37,4 +42,5 @@ const userWidgetSlice = createSlice({
   },
 });
 
+export const { setUserFix } = userWidgetSlice.actions;
 export default userWidgetSlice.reducer;

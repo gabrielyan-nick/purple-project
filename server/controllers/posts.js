@@ -38,6 +38,22 @@ export const deletePost = async (req, res) => {
   }
 };
 
+export const updatePost = async (req, res) => {
+  try {
+    const { postId } = req.params;
+    const { description } = req.body;
+    const updatedPost = await Post.findByIdAndUpdate(
+      postId,
+      { description },
+      { new: true }
+    );
+    const posts = await Post.find().sort({ createdAt: -1 });
+    res.status(200).json(posts);
+  } catch(error) {
+    res.status(409).json({ message: error.message });
+  }
+}
+
 export const addComment = async (req, res) => {
   try {
     const { postId } = req.params;

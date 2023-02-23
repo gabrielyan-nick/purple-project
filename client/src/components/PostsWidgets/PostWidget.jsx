@@ -1,10 +1,12 @@
-import React from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   ChatBubbleOutlineOutlined,
   FavoriteBorderOutlined,
   FavoriteOutlined,
   ShareOutlined,
   Close,
+  Edit,
+  Save,
 } from "@mui/icons-material";
 import { Box, IconButton, InputBase, Typography, Button } from "@mui/material";
 import {
@@ -14,9 +16,13 @@ import {
   PostCommentMemo,
   PhotoModal,
 } from "../index";
-import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { patchLike, addComment, deletePost } from "./postsWidgetsSlice";
+import {
+  patchLike,
+  addComment,
+  deletePost,
+  updatePost,
+} from "./postsWidgetsSlice";
 import { useTheme } from "@emotion/react";
 
 const PostWidget = ({
@@ -31,6 +37,8 @@ const PostWidget = ({
   comments,
   createdAt,
 }) => {
+  const [postEditedText, setPostEditedText] = useState(description);
+  const [isPostEditing, setIsPostEditing] = useState(false);
   const [isComments, setIsComments] = useState(false);
   const [comment, setComment] = useState("");
   const [isEditingComment, setIsEditingComment] = useState(false);
@@ -45,6 +53,7 @@ const PostWidget = ({
     .toLocaleString()
     .slice(0, -3);
   const isMyPost = loggedInUserId === postUserId;
+  const postRef = useRef(null);
 
   const onPatchLike = () => {
     dispatch(patchLike({ postId, token, loggedInUserId }));
@@ -52,6 +61,18 @@ const PostWidget = ({
 
   const onDelPost = () => {
     dispatch(deletePost({ postId, token }));
+  };
+
+  const onEditPost = () => {
+    setIsPostEditing(true);
+  };
+
+  const onSaveEditedPost = () => {
+    const data = {
+      description: postEditedText,
+    };
+    dispatch(updatePost({ postId, data, token }));
+    setIsPostEditing(false);
   };
 
   const onAddComment = () => {
@@ -66,6 +87,16 @@ const PostWidget = ({
     setIsEditingComment(value);
   };
 
+  useEffect(() => {
+    if (postRef.current) {
+      postRef.current.focus();
+      postRef.current.setSelectionRange(
+        postRef.current.value.length,
+        postRef.current.value.length
+      );
+    }
+  }, [isPostEditing]);
+
   const openPhotoModal = () => setIsPhotoModalOpen(true);
   const closePhotoModal = () => setIsPhotoModalOpen(false);
 
@@ -79,27 +110,71 @@ const PostWidget = ({
             subtitle={location}
             userPicturePath={userPicturePath}
           />
-          {isMyPost && (
+          {isMyPost && !isPostEditing ? (
+            <Box display="flex">
+              <IconButton
+                size="small"
+                sx={{
+                  height: "30px",
+                  marginTop: "-35px",
+                  "&:hover": { color: palette.primary.main, cursor: "pointer" },
+                }}
+                onClick={onEditPost}
+              >
+                <Edit />
+              </IconButton>
+              <IconButton
+                size="small"
+                sx={{
+                  height: "30px",
+                  margin: "-35px -5px 0",
+                  "&:hover": { color: palette.primary.main, cursor: "pointer" },
+                }}
+                onClick={onDelPost}
+              >
+                <Close />
+              </IconButton>
+            </Box>
+          ) : isMyPost && isPostEditing ? (
             <IconButton
               size="small"
               sx={{
-                alignSelf: "flex-start",
-                margin: "-10px -5px 0",
+                margin: "-40px -5px 0",
                 "&:hover": { color: palette.primary.main, cursor: "pointer" },
               }}
-              onClick={onDelPost}
+              onClick={onSaveEditedPost}
             >
-              <Close />
+              <Save />
             </IconButton>
-          )}
+          ) : null}
         </FlexBetweenBox>
 
         <Typography mt="5px" variant="subtitle2" color="grey">
           {postCreatedTime}
         </Typography>
-        <Typography fontWeight="500" mt="5px">
-          {description}
-        </Typography>
+
+        {isMyPost && isPostEditing ? (
+          <InputBase
+            inputRef={postRef}
+            onChange={(e) => setPostEditedText(e.target.value)}
+            value={postEditedText}
+            multiline
+            sx={{
+              width: "95%",
+              backgroundColor: "transparent",
+              marginTop: "5px",
+              paddingLeft: "10px",
+              lineHeight: 1.5,
+              borderRadius: "15px",
+              boxShadow: `0px 0px 6px ${palette.primary.main}`,
+            }}
+          />
+        ) : (
+          <Typography fontWeight="500" mt="5px" sx={{ wordWrap: "break-word" }}>
+            {description}
+          </Typography>
+        )}
+
         {picturePath && (
           <img
             src={`http://localhost:3001/assets/${picturePath}`}

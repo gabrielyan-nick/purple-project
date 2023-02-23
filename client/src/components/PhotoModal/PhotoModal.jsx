@@ -97,3 +97,5 @@ const PhotoModal = ({ image, alt = "post image", closeModal }) => {
 };
 
 export default PhotoModal;
+
+

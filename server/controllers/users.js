@@ -60,3 +60,22 @@ export const addRemoveFriend = async (req, res) => {
     res.status(404).json({ message: error.message });
   }
 };
+
+export const updateUserInfo = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { location, occupation } = req.body;
+    const updatedUser = await User.findByIdAndUpdate(
+      id,
+      {
+        location,
+        occupation,
+      },
+      { new: true }
+    );
+
+    res.status(200).json(updatedUser);
+  } catch (error) {
+    res.status(409).json({ message: error.message });
+  }
+};

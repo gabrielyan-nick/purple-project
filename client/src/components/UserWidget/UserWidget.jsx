@@ -5,6 +5,8 @@ import {
   WorkOutlineOutlined,
   PersonRemoveOutlined,
   PersonAddOutlined,
+  Edit,
+  Save,
 } from "@mui/icons-material";
 import ContentLoader from "react-content-loader";
 import {
@@ -14,40 +16,48 @@ import {
   useTheme,
   CircularProgress,
   IconButton,
+  InputBase,
 } from "@mui/material";
-import {
-  UserImage,
-  FlexBetweenBox,
-  WidgetWrapper,
-  PhotoModal,
-} from "components";
+import { FlexBetweenBox, WidgetWrapper, PhotoModal } from "components";
 import { useSelector, useDispatch } from "react-redux";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { fetchUserData } from "./userWidgetSlice";
-import { patchFriend } from "../../store";
-import { setListFix } from "../FriendListWidget/friendListWidgetSlice";
+import { fetchUserData, setUserFix } from "./userWidgetSlice";
+import { patchFriend, updateUserData } from "../../store";
+import { setListFix } from "components/FriendListWidget/friendListWidgetSlice";
 
 const UserWidget = ({ userId, picturePath }) => {
+  const user = useSelector((state) => state.userWidget.userData);
+  const loggedInUser = useSelector((state) => state.auth.user);
+  const isMyUserWidget = loggedInUser._id === userId;
+  // const currentUser = isMyUserWidget ? loggedInUser : user;
+  const { firstName, lastName, location, occupation } = user;
+  const [locationEditedText, setLocationEditedText] = useState(
+    loggedInUser.location
+  );
+  const [occupationEditedText, setOccupationEditedText] = useState(
+    loggedInUser.occupation
+  );
+  const [isLocationEdited, setIsLocationEdited] = useState(false);
+  const [isOccupationEdited, setIsOccupationEdited] = useState(false);
   const [isPhotoModalOpen, setIsPhotoModalOpen] = useState(false);
   const [patchFriendStatus, setPatchFriendStatus] = useState("idle");
   const { listFixState } = useSelector((state) => state.friendListWidget);
+  const { userFixState } = useSelector((state) => state.userWidget);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { token } = useSelector((state) => state.auth);
   const userWidgetLoadingStatus = useSelector(
     (state) => state.userWidget.userLoadingStatus
   );
-  const loggedInUser = useSelector((state) => state.auth.user);
-  const user = useSelector((state) => state.userWidget.userData);
-  const isMyUserWidget = loggedInUser._id === userId;
-  const currentUser = isMyUserWidget ? loggedInUser : user;
   const isFriend = loggedInUser.friends.find((user) => user._id === userId);
   const { palette } = useTheme();
+  // const locationRef = useRef(null);
+  // const occupationRef = useRef(null);
 
   useEffect(() => {
     dispatch(fetchUserData({ userId, token }));
-  }, [listFixState]);
+  }, [ userFixState, listFixState]);
 
   const onNavigate = () => {
     navigate(`/profile/${userId}`);
@@ -67,13 +77,41 @@ const UserWidget = ({ userId, picturePath }) => {
     });
   };
 
+  const onEditLocation = () => {
+    setIsLocationEdited(true);
+  };
+
+  const onEditOccupation = () => {
+    setIsOccupationEdited(true);
+  };
+
+  const onSaveEditedLocation = () => {
+    const data = {
+      location: locationEditedText,
+      occupation,
+    };
+    dispatch(updateUserData({ id: loggedInUser._id, data, token }));
+    setIsLocationEdited(false);
+    dispatch(setUserFix());
+    dispatch(setListFix());
+  };
+
+  const onSaveEditedOccupation = () => {
+    const data = {
+      location,
+      occupation: occupationEditedText,
+    };
+    dispatch(updateUserData({ id: loggedInUser._id, data, token }));
+    setIsOccupationEdited(false);
+    dispatch(setUserFix());
+    dispatch(setListFix());
+  };
+
   if (
     (userWidgetLoadingStatus === "loading" && !user) ||
     userWidgetLoadingStatus === "error"
   )
     return <UserWidgetSkeleton />;
-
-  const { firstName, lastName, location, occupation, friends } = user;
 
   return (
     <Box>
@@ -107,8 +145,8 @@ const UserWidget = ({ userId, picturePath }) => {
                 {firstName} {lastName}
               </Typography>
               <Typography>
-                {currentUser.friends.length}{" "}
-                {currentUser.friends.length === 1 ? "friend" : "friends"}
+                {user.friends.length}{" "}
+                {user.friends.length === 1 ? "friend" : "friends"}
               </Typography>
             </Box>
           </FlexBetweenBox>
@@ -149,14 +187,87 @@ const UserWidget = ({ userId, picturePath }) => {
         <Divider />
         {/* SECOND ROW */}
         <Box py="10px">
-          <Box display="flex" alignItems="center" gap="10px" mb="5px">
-            <LocationOnOutlined sx={{ color: palette.primary.main }} />
-            <Typography>{location}</Typography>
-          </Box>
-          <Box display="flex" alignItems="center" gap="10px">
-            <WorkOutlineOutlined sx={{ color: palette.primary.main }} />
-            <Typography>{occupation}</Typography>
-          </Box>
+          <FlexBetweenBox gap="10px" mb="5px">
+            <Box
+              display="flex"
+              alignItems="center"
+              gap="10px"
+              sx={{ width: "90%", height: '28px' }}
+            >
+              <LocationOnOutlined sx={{ color: palette.primary.main }} />
+
+              {isMyUserWidget && isLocationEdited ? (
+                <InputBase
+                  //  inputRef={postRef}
+                  onChange={(e) => setLocationEditedText(e.target.value)}
+                  value={locationEditedText}
+                  sx={{
+                    width: "100%",
+                    backgroundColor: "transparent",
+                    paddingLeft: "10px",
+                    borderRadius: "15px",
+                    boxShadow: `0px 0px 6px ${palette.primary.main}`,
+                  }}
+                />
+              ) : (
+                <Typography>{location}</Typography>
+              )}
+            </Box>
+
+            {isMyUserWidget && !isLocationEdited ? (
+              <IconButton onClick={onEditLocation} sx={{ padding: "3px" }}>
+                <Edit sx={{ "&:hover": { color: palette.primary.main } }} />
+              </IconButton>
+            ) : isMyUserWidget && isLocationEdited ? (
+              <IconButton
+                onClick={onSaveEditedLocation}
+                sx={{ padding: "3px" }}
+              >
+                <Save sx={{ "&:hover": { color: palette.primary.main } }} />
+              </IconButton>
+            ) : null}
+          </FlexBetweenBox>
+
+          <FlexBetweenBox gap="10px">
+            <Box
+              display="flex"
+              alignItems="center"
+              gap="10px"
+              sx={{ width: "90%", height: '28px' }}
+            >
+              <WorkOutlineOutlined sx={{ color: palette.primary.main }} />
+
+              {isMyUserWidget && isOccupationEdited ? (
+                <InputBase
+                  //  inputRef={postRef}
+                  onChange={(e) => setOccupationEditedText(e.target.value)}
+                  value={occupationEditedText}
+                  sx={{
+                    width: "100%",
+                    backgroundColor: "transparent",
+                    paddingLeft: "10px",
+                    borderRadius: "15px",
+                    boxShadow: `0px 0px 6px ${palette.primary.main}`,
+                  }}
+                />
+              ) : (
+                <Typography>{occupation}</Typography>
+              )}
+            </Box>
+
+            {isMyUserWidget && !isOccupationEdited ? (
+              <IconButton onClick={onEditOccupation} sx={{ padding: "3px" }}>
+                <Edit sx={{ "&:hover": { color: palette.primary.main } }} />
+              </IconButton>
+            ) : isMyUserWidget && isOccupationEdited ? (
+              <IconButton
+                onClick={onSaveEditedOccupation}
+                sx={{ padding: "3px" }}
+              >
+                <Save sx={{ "&:hover": { color: palette.primary.main } }} />
+              </IconButton>
+            ) : null}
+          </FlexBetweenBox>
         </Box>
         <Divider />
         {/* THIRD ROW */}
@@ -179,9 +290,6 @@ const UserWidget = ({ userId, picturePath }) => {
                 <Typography>Social network</Typography>
               </Box>
             </FlexBetweenBox>
-            <EditOutlined
-              sx={{ color: palette.primary.main, cursor: "pointer" }}
-            />
           </FlexBetweenBox>
 
           <FlexBetweenBox gap="10px">
@@ -198,9 +306,6 @@ const UserWidget = ({ userId, picturePath }) => {
                 <Typography>Network platform</Typography>
               </Box>
             </FlexBetweenBox>
-            <EditOutlined
-              sx={{ color: palette.primary.main, cursor: "pointer" }}
-            />
           </FlexBetweenBox>
         </Box>
       </WidgetWrapper>

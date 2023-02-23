@@ -6,6 +6,22 @@ const initialState = {
   token: null,
 };
 
+export const updateUserData = createAsyncThunk(
+  "user/updateUserData",
+  async ({ id, data, token }) => {
+    const response = await fetch(`http://localhost:3001/users/${id}`, {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+    const user = await response.json();
+    return user;
+  }
+);
+
 export const patchFriend = createAsyncThunk(
   "user/patchFriend",
   async ({ _id, friendId, token }) => {
@@ -70,6 +86,9 @@ const authSlice = createSlice({
       })
       .addCase(getMyFriendList.fulfilled, (state, action) => {
         state.user.friends = action.payload;
+      })
+      .addCase(updateUserData.fulfilled, (state, action) => {
+        state.user = action.payload;
       });
   },
 });
