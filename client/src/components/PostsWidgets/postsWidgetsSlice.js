@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
 const initialState = {
   posts: [],
-  postsLoadingStatus: "idle",
+  postsReloadFix: false, // Меняем значение при изменении данных пользователя. Изменение запускает эффект обновления постов.
 };
 
 export const fetchPosts = createAsyncThunk(
@@ -66,17 +66,14 @@ export const deletePost = createAsyncThunk(
 export const updatePost = createAsyncThunk(
   "posts/updatePost",
   async ({ postId, data, token }) => {
-    const response = await fetch(
-      `http://localhost:3001/posts/${postId}`,
-      {
-        method: "PATCH",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      }
-    );
+    const response = await fetch(`http://localhost:3001/posts/${postId}`, {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
     const posts = await response.json();
     if (posts.message) return [];
     return posts;
@@ -160,29 +157,33 @@ export const patchLike = createAsyncThunk(
 const postsWidgetSlice = createSlice({
   name: "postsWidget",
   initialState,
-  reducers: {},
+  reducers: {
+    setPostsReloadFix: (state) => {
+      state.postsReloadFix = !state.postsReloadFix;
+    },
+  },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchPosts.pending, (state) => {
-        state.postsLoadingStatus = "loading";
-      })
+      // .addCase(fetchPosts.pending, (state) => {
+      //   state.postsLoadingStatus = "loading";
+      // })
       .addCase(fetchPosts.fulfilled, (state, action) => {
-        state.postsLoadingStatus = "idle";
+        // state.postsLoadingStatus = "idle";
         state.posts = action.payload;
       })
-      .addCase(fetchPosts.rejected, (state) => {
-        state.postsLoadingStatus = "error";
-      })
-      .addCase(fetchUserPosts.pending, (state) => {
-        state.postsLoadingStatus = "loading";
-      })
+      // .addCase(fetchPosts.rejected, (state) => {
+      //   state.postsLoadingStatus = "error";
+      // })
+      // .addCase(fetchUserPosts.pending, (state) => {
+      //   state.postsLoadingStatus = "loading";
+      // })
       .addCase(fetchUserPosts.fulfilled, (state, action) => {
-        state.postsLoadingStatus = "idle";
+        // state.postsLoadingStatus = "idle";
         state.posts = action.payload;
       })
-      .addCase(fetchUserPosts.rejected, (state) => {
-        state.postsLoadingStatus = "error";
-      })
+      // .addCase(fetchUserPosts.rejected, (state) => {
+      //   state.postsLoadingStatus = "error";
+      // })
       .addCase(addMyPost.fulfilled, (state, action) => {
         state.posts = action.payload;
       })
@@ -223,4 +224,5 @@ const postsWidgetSlice = createSlice({
   },
 });
 
+export const { setPostsReloadFix } = postsWidgetSlice.actions;
 export default postsWidgetSlice.reducer;

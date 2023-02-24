@@ -107,7 +107,7 @@ const PostWidget = ({
           <Friend
             friendId={postUserId}
             name={name}
-            subtitle={location}
+            subtitle={postCreatedTime}
             userPicturePath={userPicturePath}
           />
           {isMyPost && !isPostEditing ? (
@@ -149,10 +149,6 @@ const PostWidget = ({
           ) : null}
         </FlexBetweenBox>
 
-        <Typography mt="5px" variant="subtitle2" color="grey">
-          {postCreatedTime}
-        </Typography>
-
         {isMyPost && isPostEditing ? (
           <InputBase
             inputRef={postRef}
@@ -162,7 +158,7 @@ const PostWidget = ({
             sx={{
               width: "95%",
               backgroundColor: "transparent",
-              marginTop: "5px",
+              marginTop: "10px",
               paddingLeft: "10px",
               lineHeight: 1.5,
               borderRadius: "15px",
@@ -170,7 +166,7 @@ const PostWidget = ({
             }}
           />
         ) : (
-          <Typography fontWeight="500" mt="5px" sx={{ wordWrap: "break-word" }}>
+          <Typography fontWeight="500" mt="10px" sx={{ wordWrap: "break-word" }}>
             {description}
           </Typography>
         )}
@@ -189,6 +185,7 @@ const PostWidget = ({
             onClick={openPhotoModal}
           />
         )}
+  
         <FlexBetweenBox m="7px 0 5px">
           <FlexBetweenBox gap="10px">
             <FlexBetweenBox gap="5px">

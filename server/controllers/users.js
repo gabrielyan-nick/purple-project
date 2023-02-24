@@ -1,4 +1,5 @@
 import User from "../models/User.js";
+import Post from "../models/Post.js";
 
 // READ
 export const getUser = async (req, res) => {
@@ -73,7 +74,24 @@ export const updateUserInfo = async (req, res) => {
       },
       { new: true }
     );
+    res.status(200).json(updatedUser);
+  } catch (error) {
+    res.status(409).json({ message: error.message });
+  }
+};
 
+export const changeAvatar = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { picturePath } = req.body;
+    const updatedUser = await User.findByIdAndUpdate(
+      id,
+      {
+        picturePath,
+      },
+      { new: true }
+    );
+    await Post.updateMany({ userId: id }, { userPicturePath: picturePath });
     res.status(200).json(updatedUser);
   } catch (error) {
     res.status(409).json({ message: error.message });

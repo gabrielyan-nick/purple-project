@@ -7,6 +7,8 @@ import {
   PersonAddOutlined,
   Edit,
   Save,
+  Close,
+  AddAPhoto,
 } from "@mui/icons-material";
 import ContentLoader from "react-content-loader";
 import {
@@ -25,13 +27,16 @@ import { useNavigate } from "react-router-dom";
 import { fetchUserData, setUserFix } from "./userWidgetSlice";
 import { patchFriend, updateUserData } from "../../store";
 import { setListFix } from "components/FriendListWidget/friendListWidgetSlice";
+import { setPostsReloadFix } from "components/PostsWidgets/postsWidgetsSlice";
 
 const UserWidget = ({ userId, picturePath }) => {
   const user = useSelector((state) => state.userWidget.userData);
   const loggedInUser = useSelector((state) => state.auth.user);
   const isMyUserWidget = loggedInUser._id === userId;
-  // const currentUser = isMyUserWidget ? loggedInUser : user;
+  const currentUser = isMyUserWidget ? loggedInUser : user;
   const { firstName, lastName, location, occupation } = user;
+  const [changedAvatar, setChangedAvatar] = useState(null);
+  const [changedAvatarUrl, setChangedAvatarUrl] = useState(null);
   const [locationEditedText, setLocationEditedText] = useState(
     loggedInUser.location
   );
@@ -50,14 +55,32 @@ const UserWidget = ({ userId, picturePath }) => {
   const userWidgetLoadingStatus = useSelector(
     (state) => state.userWidget.userLoadingStatus
   );
-  const isFriend = loggedInUser.friends.find((user) => user._id === userId);
+  const isFriend = !!loggedInUser.friends.find((user) => user._id === userId);
   const { palette } = useTheme();
-  // const locationRef = useRef(null);
-  // const occupationRef = useRef(null);
+  const locationRef = useRef(null);
+  const occupationRef = useRef(null);
 
   useEffect(() => {
     dispatch(fetchUserData({ userId, token }));
-  }, [ userFixState, listFixState]);
+  }, [userFixState, listFixState]);
+
+  useEffect(() => {
+    focusInputs(locationRef);
+  }, [isLocationEdited]);
+
+  useEffect(() => {
+    focusInputs(occupationRef);
+  }, [isOccupationEdited]);
+
+  const focusInputs = (ref) => {
+    if (ref.current) {
+      ref.current.focus();
+      ref.current.setSelectionRange(
+        ref.current.value.length,
+        ref.current.value.length
+      );
+    }
+  };
 
   const onNavigate = () => {
     navigate(`/profile/${userId}`);
@@ -86,25 +109,54 @@ const UserWidget = ({ userId, picturePath }) => {
   };
 
   const onSaveEditedLocation = () => {
-    const data = {
-      location: locationEditedText,
-      occupation,
-    };
-    dispatch(updateUserData({ id: loggedInUser._id, data, token }));
+    const formData = new FormData();
+    formData.append("location", locationEditedText);
+    formData.append("occupation", occupation);
+    dispatch(updateUserData({ id: loggedInUser._id, formData, token }));
     setIsLocationEdited(false);
     dispatch(setUserFix());
     dispatch(setListFix());
   };
 
   const onSaveEditedOccupation = () => {
-    const data = {
-      location,
-      occupation: occupationEditedText,
-    };
-    dispatch(updateUserData({ id: loggedInUser._id, data, token }));
+    const formData = new FormData();
+    formData.append("location", location);
+    formData.append("occupation", occupationEditedText);
+    dispatch(updateUserData({ id: loggedInUser._id, formData, token }));
     setIsOccupationEdited(false);
     dispatch(setUserFix());
     dispatch(setListFix());
+  };
+
+  const onChangeAvatar = (e) => {
+    const avatar = e.target.files[0];
+    if (avatar) {
+      const reader = new FileReader();
+      reader.readAsDataURL(avatar);
+      reader.onload = () => {
+        setChangedAvatar(avatar);
+        setChangedAvatarUrl(reader.result);
+      };
+    }
+  };
+
+  const onSaveChangedAvatar = () => {
+    const formData = new FormData();
+    formData.append("picture", changedAvatar);
+    formData.append("picturePath", changedAvatar.name);
+    dispatch(
+      updateUserData({ id: `${loggedInUser._id}/avatar`, formData, token })
+    ).then(() => {
+      setChangedAvatar(null);
+      setChangedAvatarUrl(null);
+      dispatch(setListFix());
+      dispatch(setPostsReloadFix());
+    });
+  };
+
+  const onCancelChangeAvatar = () => {
+    setChangedAvatar(null);
+    setChangedAvatarUrl(null);
   };
 
   if (
@@ -117,11 +169,15 @@ const UserWidget = ({ userId, picturePath }) => {
     <Box>
       <WidgetWrapper>
         {/* FIRST ROW */}
-        <FlexBetweenBox gap="10px" pb="10px">
+        <FlexBetweenBox gap="10px" pb="10px" sx={{ maxHeight: "80px" }}>
           <FlexBetweenBox gap="20px">
             <Box width="60px" height="60px">
               <img
-                src={`http://localhost:3001/assets/${picturePath}`}
+                src={`${
+                  changedAvatar === null
+                    ? `http://localhost:3001/assets/${currentUser.picturePath}`
+                    : changedAvatarUrl
+                } `}
                 alt="user"
                 style={{
                   objectFit: "cover",
@@ -145,22 +201,57 @@ const UserWidget = ({ userId, picturePath }) => {
                 {firstName} {lastName}
               </Typography>
               <Typography>
-                {user.friends.length}{" "}
-                {user.friends.length === 1 ? "friend" : "friends"}
+                {user?.friends?.length}{" "}
+                {user?.friends?.length === 1 ? "friend" : "friends"}
               </Typography>
             </Box>
           </FlexBetweenBox>
+          {isMyUserWidget && changedAvatar === null ? (
+            <IconButton component="label">
+              <AddAPhoto
+                sx={{
+                  "&:hover": {
+                    color: palette.primary.main,
+                    cursor: "pointer",
+                  },
+                }}
+              />
+              <input
+                type="file"
+                hidden
+                accept="image/png, image/jpg, image/jpeg"
+                onChange={onChangeAvatar}
+              />
+            </IconButton>
+          ) : isMyUserWidget && changedAvatar !== null ? (
+            <Box display="flex" flexDirection="column">
+              <IconButton
+                onClick={onCancelChangeAvatar}
+                sx={{ padding: "3px" }}
+              >
+                <Close
+                  sx={{
+                    "&:hover": {
+                      color: palette.primary.main,
+                      cursor: "pointer",
+                    },
+                  }}
+                />
+              </IconButton>
+              <IconButton onClick={onSaveChangedAvatar} sx={{ padding: "3px" }}>
+                <Save
+                  sx={{
+                    "&:hover": {
+                      color: palette.primary.main,
+                      cursor: "pointer",
+                    },
+                  }}
+                />
+              </IconButton>
+            </Box>
+          ) : null}
 
-          {isMyUserWidget ? (
-            <ManageAccountsOutlined
-              sx={{
-                color: palette.primary.main,
-                cursor: "pointer",
-                width: "25px",
-                height: "25px",
-              }}
-            />
-          ) : isFriend && patchFriendStatus === "idle" ? (
+          {isFriend && patchFriendStatus === "idle" && !isMyUserWidget ? (
             <IconButton onClick={onPatchFriend}>
               <PersonRemoveOutlined
                 sx={{
@@ -170,7 +261,7 @@ const UserWidget = ({ userId, picturePath }) => {
                 }}
               />
             </IconButton>
-          ) : !isFriend && patchFriendStatus === "idle" ? (
+          ) : !isFriend && patchFriendStatus === "idle" && !isMyUserWidget ? (
             <IconButton onClick={onPatchFriend}>
               <PersonAddOutlined
                 sx={{
@@ -180,9 +271,9 @@ const UserWidget = ({ userId, picturePath }) => {
                 }}
               />
             </IconButton>
-          ) : (
+          ) : patchFriendStatus === "loading" ? (
             <CircularProgress size={26} />
-          )}
+          ) : null}
         </FlexBetweenBox>
         <Divider />
         {/* SECOND ROW */}
@@ -192,13 +283,13 @@ const UserWidget = ({ userId, picturePath }) => {
               display="flex"
               alignItems="center"
               gap="10px"
-              sx={{ width: "90%", height: '28px' }}
+              sx={{ width: "90%", height: "28px" }}
             >
               <LocationOnOutlined sx={{ color: palette.primary.main }} />
 
               {isMyUserWidget && isLocationEdited ? (
                 <InputBase
-                  //  inputRef={postRef}
+                  inputRef={locationRef}
                   onChange={(e) => setLocationEditedText(e.target.value)}
                   value={locationEditedText}
                   sx={{
@@ -233,13 +324,13 @@ const UserWidget = ({ userId, picturePath }) => {
               display="flex"
               alignItems="center"
               gap="10px"
-              sx={{ width: "90%", height: '28px' }}
+              sx={{ width: "90%", height: "28px" }}
             >
               <WorkOutlineOutlined sx={{ color: palette.primary.main }} />
 
               {isMyUserWidget && isOccupationEdited ? (
                 <InputBase
-                  //  inputRef={postRef}
+                  inputRef={occupationRef}
                   onChange={(e) => setOccupationEditedText(e.target.value)}
                   value={occupationEditedText}
                   sx={{
@@ -312,8 +403,8 @@ const UserWidget = ({ userId, picturePath }) => {
 
       {isPhotoModalOpen && (
         <PhotoModal
-          image={picturePath}
-          alt={firstName}
+          image={currentUser.picturePath}
+          alt={currentUser.firstName}
           closeModal={closePhotoModal}
         />
       )}

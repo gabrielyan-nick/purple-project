@@ -12,6 +12,8 @@ import { useNavigate } from "react-router-dom";
 import { FlexBetweenBox, UserImage } from "./index";
 import { patchFriend } from "./../store/index";
 import { setListFix } from "./FriendListWidget/friendListWidgetSlice";
+import { setUserFix } from "./UserWidget/userWidgetSlice";
+import { setPostsReloadFix } from "./PostsWidgets/postsWidgetsSlice";
 
 const Friend = ({
   friendId,
@@ -30,19 +32,22 @@ const Friend = ({
   const { palette } = useTheme();
   const isFriend = currentFriends.find((friend) => friend._id === friendId);
   const isMyPost = _id === friendId;
+  const isDateSubtitle = /^\d{2}\.\d{2}\.\d{4}, \d{2}:\d{2}$/.test(subtitle);
 
   const onPatchFriend = () => {
     setPatchFriendStatus("loading");
     dispatch(patchFriend({ _id, friendId, token })).then(() => {
       setPatchFriendStatus("idle");
       dispatch(setListFix());
-      // navigate(0);
+      dispatch(setPostsReloadFix());
     });
   };
 
   const onNavigate = () => {
     navigate(`/profile/${friendId}`);
-    navigate(0);
+    dispatch(setListFix());
+    dispatch(setPostsReloadFix());
+    // dispatch(setUserFix());
   };
 
   return (
@@ -60,7 +65,13 @@ const Friend = ({
           >
             {name}
           </Typography>
-          <Typography>{subtitle}</Typography>
+          {isDateSubtitle ? (
+            <Typography variant="subtitle2" color="grey">
+              {subtitle}
+            </Typography>
+          ) : (
+            <Typography>{subtitle}</Typography>
+          )}
         </Box>
       </FlexBetweenBox>
       {!isMyPost && (

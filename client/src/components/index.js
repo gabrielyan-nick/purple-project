@@ -6,7 +6,7 @@ export { default as Navbar } from "./navbar";
 export { default as UserImage } from "./UserImage";
 export { default as WidgetWrapper } from "./WidgetWrapper";
 export { default as UserWidget } from "./UserWidget/UserWidget";
-export { default as MyPostWidget } from "./MyPostWidget";
+export { default as MyPostWidget } from "./PostsWidgets/MyPostWidget";
 export { PostWidgetMemo } from "./PostsWidgets/PostWidget";
 export { default as PostsWidget } from "./PostsWidgets/PostsWidget";
 export { default as Friend } from "./Friend";

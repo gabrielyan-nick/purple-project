@@ -5,6 +5,7 @@ import { PostWidgetMemo } from "../index";
 import { Box } from "@mui/system";
 
 const PostsWidget = ({ userId, isProfile = false }) => {
+  const postsReloadFix = useSelector(state => state.postsWidget.postsReloadFix)
   const dispatch = useDispatch();
   const token = useSelector((state) => state.auth.token);
   const { posts } = useSelector((state) => state.postsWidget);
@@ -13,7 +14,7 @@ const PostsWidget = ({ userId, isProfile = false }) => {
     isProfile
       ? dispatch(fetchUserPosts({ userId, token }))
       : dispatch(fetchPosts(token));
-  }, []);
+  }, [postsReloadFix]);
 
   return (
     <Box display='flex' flexDirection='column' gap='20px'>

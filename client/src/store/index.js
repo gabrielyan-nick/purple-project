@@ -8,19 +8,20 @@ const initialState = {
 
 export const updateUserData = createAsyncThunk(
   "user/updateUserData",
-  async ({ id, data, token }) => {
+  async ({ id, formData, token }) => {
     const response = await fetch(`http://localhost:3001/users/${id}`, {
       method: "PATCH",
       headers: {
         Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
       },
-      body: JSON.stringify(data),
+      body: formData,
     });
     const user = await response.json();
+    if (user.message) return [];
     return user;
   }
 );
+
 
 export const patchFriend = createAsyncThunk(
   "user/patchFriend",

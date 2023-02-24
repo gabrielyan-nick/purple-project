@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { addMyPost } from "./PostsWidgets/postsWidgetsSlice";
+import { addMyPost } from "./postsWidgetsSlice";
 import {
   Box,
   Divider,
