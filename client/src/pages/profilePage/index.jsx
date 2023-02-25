@@ -39,10 +39,11 @@ const ProfilePage = () => {
       <Navbar />
       <Box
         width="100%"
-        padding={`20px ${!isSmallScreens ? "4%" : "1%"} `}
+        padding={`20px ${!isSmallScreens ? "50px" : "10px"} `}
         display={isNonMobileScreens ? "flex" : "block"}
         gap="15px"
         justifyContent="space-between"
+       
       >
         <Box flexBasis={isNonMobileScreens ? "26%" : undefined}>
           <UserWidget userId={userId} picturePath={user.picturePath} />

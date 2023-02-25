@@ -1,4 +1,4 @@
-import { React, useState, useRef, useEffect } from "react";
+import { React, useState, useRef, useEffect,  } from "react";
 import {
   Box,
   IconButton,
@@ -69,9 +69,9 @@ const Navbar = () => {
     >
       <FlexBetweenBox gap="50px">
         {mode === "light" ? (
-          <LightLogo  navigate={() => navigate("/home")} pointer="pointer" />
+          <LightLogo navigate={() => navigate("/home")} pointer="pointer" />
         ) : (
-          <DarkLogo  navigate={() => navigate("/home")} pointer="pointer" />
+          <DarkLogo navigate={() => navigate("/home")} pointer="pointer" />
         )}
 
         {isNonMobileScreens && (

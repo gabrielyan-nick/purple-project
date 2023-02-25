@@ -13,7 +13,7 @@ const PostsWidget = ({ userId, isProfile = false }) => {
   useEffect(() => {
     isProfile
       ? dispatch(fetchUserPosts({ userId, token }))
-      : dispatch(fetchPosts(token));
+      : dispatch(fetchPosts({token}));
   }, [postsReloadFix]);
 
   return (

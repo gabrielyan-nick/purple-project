@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { Box, useMediaQuery } from "@mui/material";
 import {
@@ -19,7 +19,7 @@ const HomePage = () => {
       <Navbar />
       <Box
         width="100%"
-        padding={`20px ${!isSmallScreens ? "4%" : "1%"} `}
+        padding={`20px ${!isSmallScreens ? "50px" : "10px"} `}
         display={isNonMobileScreens ? "flex" : "block"}
         gap="15px"
         justifyContent="space-between"
@@ -32,7 +32,7 @@ const HomePage = () => {
           flexBasis={isNonMobileScreens ? "45%" : undefined}
           mt={isNonMobileScreens ? undefined : "20px"}
         >
-          <MyPostWidget picturePath={picturePath}  />
+          <MyPostWidget picturePath={picturePath} />
           <PostsWidget userId={_id} />
         </Box>
         {isNonMobileScreens && (

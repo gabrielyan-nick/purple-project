@@ -2,16 +2,20 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
 const initialState = {
   posts: [],
+  postsLoadingStatus: "idle",
   postsReloadFix: false, // Меняем значение при изменении данных пользователя. Изменение запускает эффект обновления постов.
 };
 
 export const fetchPosts = createAsyncThunk(
   "posts/fetchPosts",
-  async (token) => {
-    const response = await fetch(`http://localhost:3001/posts`, {
-      method: "GET",
-      headers: { Authorization: `Bearer ${token}` },
-    });
+  async ({ token, offset = 0, limit = 5 }) => {
+    const response = await fetch(
+      `http://localhost:3001/posts?offset=${offset}&limit=${limit}`,
+      {
+        method: "GET",
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
     const posts = await response.json();
     if (posts.message) return [];
     return posts;
@@ -164,26 +168,16 @@ const postsWidgetSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // .addCase(fetchPosts.pending, (state) => {
-      //   state.postsLoadingStatus = "loading";
-      // })
+      .addCase(fetchPosts.pending, (state) => {
+        state.postsLoadingStatus = "loading";
+      })
       .addCase(fetchPosts.fulfilled, (state, action) => {
-        // state.postsLoadingStatus = "idle";
         state.posts = action.payload;
+        state.postsLoadingStatus = "idle";
       })
-      // .addCase(fetchPosts.rejected, (state) => {
-      //   state.postsLoadingStatus = "error";
-      // })
-      // .addCase(fetchUserPosts.pending, (state) => {
-      //   state.postsLoadingStatus = "loading";
-      // })
       .addCase(fetchUserPosts.fulfilled, (state, action) => {
-        // state.postsLoadingStatus = "idle";
         state.posts = action.payload;
       })
-      // .addCase(fetchUserPosts.rejected, (state) => {
-      //   state.postsLoadingStatus = "error";
-      // })
       .addCase(addMyPost.fulfilled, (state, action) => {
         state.posts = action.payload;
       })

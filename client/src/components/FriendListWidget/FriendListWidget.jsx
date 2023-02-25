@@ -53,9 +53,11 @@ const FriendListWidget = ({ userId, isMyList = true }) => {
               );
           }
         )}
-        {!currentFriends.length && (
+        {!currentFriends.length && !isMyList ? (
           <Typography py="15px">No friends. Be the first</Typography>
-        )}
+        ) : !currentFriends.length && isMyList ? (
+          <Typography py="15px">No friends. But you are not alone</Typography>
+        ) : null}
       </Box>
 
       {currentFriends.length > 5 && (

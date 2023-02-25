@@ -5,7 +5,7 @@ import Comment from "../models/Comment.js";
 export const createPost = async (req, res) => {
   try {
     const { userId, description, picturePath } = req.body;
-    console.log(userId, description)
+    console.log(userId, description);
     const user = await User.findById(userId);
     const newPost = new Post({
       userId,
@@ -50,10 +50,10 @@ export const updatePost = async (req, res) => {
     );
     const posts = await Post.find().sort({ createdAt: -1 });
     res.status(200).json(posts);
-  } catch(error) {
+  } catch (error) {
     res.status(409).json({ message: error.message });
   }
-}
+};
 
 export const addComment = async (req, res) => {
   try {
@@ -122,8 +122,12 @@ export const updateComment = async (req, res) => {
 
 export const getFeedPosts = async (req, res) => {
   try {
-    const post = await Post.find().sort({ createdAt: -1 });
-    res.status(200).json(post);
+    const { offset, limit } = req.query;
+    const posts = await Post.find()
+      .sort({ createdAt: -1 })
+      .skip(Number(offset))
+      .limit(Number(limit));
+    res.status(200).json(posts);
   } catch (error) {
     res.status(404).json({ message: error.message });
   }
