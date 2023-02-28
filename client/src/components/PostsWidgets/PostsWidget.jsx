@@ -1,23 +1,49 @@
-import { useEffect } from "react";
+import React, { useEffect, useState, useRef } from "react";
+import { useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchPosts, fetchUserPosts } from "./postsWidgetsSlice";
+import { fetchPosts, lazzyLoadPosts } from "./postsWidgetsSlice";
 import { PostWidgetMemo } from "../index";
 import { Box } from "@mui/system";
+import useOnIntersection from "hooks/useOnIntersection";
+import { CircularProgress } from "@mui/material";
 
 const PostsWidget = ({ userId, isProfile = false }) => {
-  const postsReloadFix = useSelector(state => state.postsWidget.postsReloadFix)
+  const [offset, setOffset] = useState(0);
+  const [limit, setLimit] = useState(5);
+  const postsReloadFix = useSelector(
+    (state) => state.postsWidget.postsReloadFix
+  );
   const dispatch = useDispatch();
   const token = useSelector((state) => state.auth.token);
-  const { posts } = useSelector((state) => state.postsWidget);
+  const { posts, isEndOfList, postsLoadingStatus } = useSelector(
+    (state) => state.postsWidget
+  );
+  const pageBottomRef = useOnIntersection(lazzyLoadingPosts);
+  const location = useLocation();
 
   useEffect(() => {
     isProfile
-      ? dispatch(fetchUserPosts({ userId, token }))
-      : dispatch(fetchPosts({token}));
+      ? dispatch(fetchPosts({ token, userId, isUsersPosts: true }))
+      : dispatch(fetchPosts({ token }));
   }, [postsReloadFix]);
 
+  useEffect(() => {
+    setOffset(0);
+  }, [location]);
+
+  function lazzyLoadingPosts() {
+    if (!isEndOfList && postsLoadingStatus !== "loading") {
+      setOffset((offset) => offset + limit);
+      isProfile
+        ? dispatch(
+            lazzyLoadPosts({ token, userId, offset, isUsersPosts: true })
+          )
+        : dispatch(lazzyLoadPosts({ token, userId, offset }));
+    }
+  }
+
   return (
-    <Box display='flex' flexDirection='column' gap='20px'>
+    <Box display="flex" flexDirection="column" gap="20px" alignItems="center">
       {posts.map(
         ({
           _id,
@@ -47,6 +73,8 @@ const PostsWidget = ({ userId, isProfile = false }) => {
           />
         )
       )}
+      {postsLoadingStatus === "loading" && <CircularProgress />}
+      <Box ref={pageBottomRef}></Box>
     </Box>
   );
 };

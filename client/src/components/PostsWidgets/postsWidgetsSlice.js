@@ -4,13 +4,16 @@ const initialState = {
   posts: [],
   postsLoadingStatus: "idle",
   postsReloadFix: false, // Меняем значение при изменении данных пользователя. Изменение запускает эффект обновления постов.
+  isEndOfList: false,
 };
 
 export const fetchPosts = createAsyncThunk(
   "posts/fetchPosts",
-  async ({ token, offset = 0, limit = 5 }) => {
+  async ({ token, userId = null, isUsersPosts = false }) => {
     const response = await fetch(
-      `http://localhost:3001/posts?offset=${offset}&limit=${limit}`,
+      `http://localhost:3001/posts${
+        isUsersPosts ? `/${userId}/posts` : ""
+      }?offset=0&limit=5`,
       {
         method: "GET",
         headers: { Authorization: `Bearer ${token}` },
@@ -22,11 +25,13 @@ export const fetchPosts = createAsyncThunk(
   }
 );
 
-export const fetchUserPosts = createAsyncThunk(
-  "posts/fetchUserPosts",
-  async ({ userId, token }) => {
+export const lazzyLoadPosts = createAsyncThunk(
+  "posts/lazzyLoadPosts",
+  async ({ token, userId, offset, limit = 5, isUsersPosts = false }) => {
     const response = await fetch(
-      `http://localhost:3001/posts/${userId}/posts`,
+      `http://localhost:3001/posts${
+        isUsersPosts ? `/${userId}/posts` : ""
+      }?offset=${offset}&limit=${limit}`,
       {
         method: "GET",
         headers: { Authorization: `Bearer ${token}` },
@@ -63,7 +68,7 @@ export const deletePost = createAsyncThunk(
     });
     const posts = await response.json();
     if (posts.message) return [];
-    return posts;
+    return { posts, postId };
   }
 );
 
@@ -172,17 +177,43 @@ const postsWidgetSlice = createSlice({
         state.postsLoadingStatus = "loading";
       })
       .addCase(fetchPosts.fulfilled, (state, action) => {
+        state.isEndOfList = false;
         state.posts = action.payload;
         state.postsLoadingStatus = "idle";
+        if (action.payload.length < 5) {
+          state.isEndOfList = true;
+        }
       })
-      .addCase(fetchUserPosts.fulfilled, (state, action) => {
-        state.posts = action.payload;
+      .addCase(lazzyLoadPosts.pending, (state) => {
+        state.postsLoadingStatus = "loading";
+      })
+      .addCase(lazzyLoadPosts.fulfilled, (state, action) => {
+        state.isEndOfList = false;
+        state.posts = state.posts
+          .concat(action.payload)
+          .filter(
+            (item, i, self) => i === self.findIndex((j) => j._id === item._id)
+          );
+        state.postsLoadingStatus = "idle";
+        if (action.payload.length < 5) {
+          state.isEndOfList = true;
+        }
       })
       .addCase(addMyPost.fulfilled, (state, action) => {
-        state.posts = action.payload;
+        state.posts = state.posts
+          .concat(action.payload)
+          .filter(
+            (item, i, self) => i === self.findIndex((j) => j._id === item._id)
+          );
       })
       .addCase(deletePost.fulfilled, (state, action) => {
-        state.posts = action.payload;
+        state.posts = state.posts
+          .concat(action.payload.posts)
+          .filter(
+            (item, i, self) =>
+              i === self.findIndex((j) => j._id === item._id) &&
+              item._id !== action.payload.postId
+          );
       })
       .addCase(updatePost.fulfilled, (state, action) => {
         state.posts = action.payload;

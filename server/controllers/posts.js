@@ -20,7 +20,7 @@ export const createPost = async (req, res) => {
     });
     await newPost.save();
 
-    const posts = await Post.find().sort({ createdAt: -1 });
+    const posts = await Post.find().limit(5).sort({ createdAt: -1 });
     res.status(201).json(posts);
   } catch (error) {
     res.status(409).json({ message: error.message });
@@ -30,9 +30,13 @@ export const createPost = async (req, res) => {
 export const deletePost = async (req, res) => {
   try {
     const { postId } = req.params;
-    await Post.findByIdAndDelete(postId);
+    const deletedPost = await Post.findByIdAndDelete(postId);
     await Comment.deleteMany({ postId });
-    const posts = await Post.find().sort({ createdAt: -1 });
+    const posts = await Post.find({ userId: deletedPost.userId })
+      .limit(5)
+      .sort({
+        createdAt: -1,
+      });
     res.status(200).json(posts);
   } catch (error) {
     res.status(409).json({ message: error.message });
@@ -48,7 +52,7 @@ export const updatePost = async (req, res) => {
       { description },
       { new: true }
     );
-    const posts = await Post.find().sort({ createdAt: -1 });
+    const posts = await Post.find().limit(5).sort({ createdAt: -1 });
     res.status(200).json(posts);
   } catch (error) {
     res.status(409).json({ message: error.message });
@@ -135,8 +139,12 @@ export const getFeedPosts = async (req, res) => {
 
 export const getUserPosts = async (req, res) => {
   try {
+    const { offset, limit } = req.query;
     const { userId } = req.params;
-    const posts = await Post.find({ userId }).sort({ createdAt: -1 });
+    const posts = await Post.find({ userId })
+      .sort({ createdAt: -1 })
+      .skip(Number(offset))
+      .limit(Number(limit));
     res.status(200).json(posts);
   } catch (error) {
     res.status(404).json({ message: error.message });
