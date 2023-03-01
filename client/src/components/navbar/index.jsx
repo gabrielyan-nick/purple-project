@@ -1,4 +1,4 @@
-import { React, useState, useRef, useEffect,  } from "react";
+import { React, useState, useRef, useEffect } from "react";
 import {
   Box,
   IconButton,
@@ -26,6 +26,7 @@ const Navbar = () => {
   const navigate = useNavigate();
   const { user, mode } = useSelector((state) => state.auth);
   const isNonMobileScreens = useMediaQuery("(min-width: 1000px)");
+  const isSmallScreens = useMediaQuery("(max-width: 600px)");
   const menuRef = useRef(null);
   const { palette } = useTheme();
   const background = palette.background.default;
@@ -58,7 +59,7 @@ const Navbar = () => {
 
   return (
     <FlexBetweenBox
-      padding="10px 50px"
+      padding={`10px ${isSmallScreens ? "15px" : "50px"}`}
       sx={{
         position: "sticky",
         top: 0,

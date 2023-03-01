@@ -4,7 +4,7 @@ import { Close } from "@mui/icons-material";
 import useOnClickOutside from "hooks/useOnClickOutside";
 import "./styles.scss";
 
-const PhotoModal = ({ image, alt = "post image", closeModal }) => {
+const PhotoModal = ({ image, alt = "post image", closeModal, isInRegForm = false }) => {
   const isNonMobileScreens = useMediaQuery("(min-width: 600px)");
   const imgRef = useRef(null);
   const modalRef = useRef(null);
@@ -74,7 +74,7 @@ const PhotoModal = ({ image, alt = "post image", closeModal }) => {
         ref={modalRef}
       >
         <img
-          src={`http://localhost:3001/assets/${image}`}
+          src={`${isInRegForm ? `${image}` : `http://localhost:3001/assets/${image}`}`}
           alt={alt}
           ref={imgRef}
           style={{ maxHeight: `${isNonMobileScreens ? "96vh" : "92vh"}` }}

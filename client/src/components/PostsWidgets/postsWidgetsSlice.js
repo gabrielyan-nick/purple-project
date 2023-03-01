@@ -204,7 +204,7 @@ const postsWidgetSlice = createSlice({
           .concat(action.payload)
           .filter(
             (item, i, self) => i === self.findIndex((j) => j._id === item._id)
-          );
+          )
       })
       .addCase(deletePost.fulfilled, (state, action) => {
         state.posts = state.posts

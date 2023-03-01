@@ -14,6 +14,8 @@ const ProfilePage = () => {
   const [user, setUser] = useState(null);
   const { userId } = useParams();
   const { token } = useSelector((state) => state.auth);
+  const loggedInUser = useSelector((state) => state.auth.user);
+  const isMyProfile = userId === loggedInUser._id;
   const isNonMobileScreens = useMediaQuery("(min-width: 1000px)");
   const isSmallScreens = useMediaQuery("(max-width: 600px)");
 
@@ -43,7 +45,6 @@ const ProfilePage = () => {
         display={isNonMobileScreens ? "flex" : "block"}
         gap="15px"
         justifyContent="space-between"
-       
       >
         <Box flexBasis={isNonMobileScreens ? "26%" : undefined}>
           <UserWidget userId={userId} picturePath={user.picturePath} />

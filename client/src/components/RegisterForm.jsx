@@ -11,13 +11,13 @@ import {
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
-import { Formik, Form, useField } from "formik";
+import { AddAPhoto } from "@mui/icons-material";
+import { Formik, Form, useField, ErrorMessage } from "formik";
 import * as yup from "yup";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setLogin } from "./../store";
-import Dropzone from "react-dropzone";
-import FlexBetweenBox from "./FlexBetweenBox";
+import { FlexBetweenBox, PhotoModal } from "./index";
 
 const registerSchema = yup.object({
   firstName: yup.string().required("Required"),
@@ -44,11 +44,6 @@ const initialValuesRegister = {
   picture: "",
 };
 
-// const initialValuesLogin = {
-//   email: "",
-//   password: "",
-// };
-
 const RegisterForm = () => {
   const [pageType, setPageType] = useState("login");
   const [showPassword, setShowPassword] = useState(false);
@@ -60,6 +55,8 @@ const RegisterForm = () => {
   const isNonMobile = useMediaQuery("(min-width: 600px)");
   const isLogin = pageType === "login";
   const isRegister = pageType === "register";
+  const [avatarUrl, setAvatarUrl] = useState(null);
+  const [isPhotoModalOpen, setIsPhotoModalOpen] = useState(false);
 
   const onToggleShowPassword = () => {
     setShowPassword((showPassword) => !showPassword);
@@ -113,164 +110,227 @@ const RegisterForm = () => {
     if (isRegister) await register(values, onSubmitProps);
   };
 
-  return (
-    <Formik
-      initialValues={initialValuesRegister}
-      validationSchema={isLogin ? loginSchema : registerSchema}
-      onSubmit={handleFormSubmit}
-    >
-      {({ values, setFieldValue, resetForm }) => (
-        <Form>
-          <Box
-            display="grid"
-            gap="30px"
-            gridTemplateColumns="repeat(2, minmax(0, 1fr))"
-            sx={{
-              "& > div": { gridColumn: isNonMobile ? undefined : "span 2" },
-            }}
-          >
-            {isRegister ? (
-              <>
-                <TextInput
-                  label="First name"
-                  name="firstName"
-                  id="firstName"
-                  sx={{ gridColumn: "span 1" }}
-                />
-                <TextInput
-                  label="Last name"
-                  name="lastName"
-                  id="lastName"
-                  sx={{ gridColumn: "span 1" }}
-                />
-                <TextInput
-                  userExist={userExist}
-                  label="Email"
-                  name="email"
-                  id="email"
-                  sx={{ gridColumn: "span 2" }}
-                />
-                <div style={{ gridColumn: "span 2", position: "relative" }}>
-                  <PasswordInput
-                    showPassword={showPassword}
-                    toggleShowPassword={onToggleShowPassword}
-                  />
-                </div>
-                <TextInput
-                  label="Location"
-                  name="location"
-                  id="location"
-                  sx={{ gridColumn: "span 2" }}
-                />
-                <TextInput
-                  label="Occupation"
-                  name="occupation"
-                  id="occupation"
-                  sx={{ gridColumn: "span 2" }}
-                />
-                <Box
-                  gridColumn="span 2"
-                  sx={{
-                    boxShadow: `0px 0px 6px ${palette.primary.main}`,
-                    borderRadius: "5px",
-                    height: '60px'
-                  }}
-                  p={1}
-                >
-                  <Dropzone
-                    acceptedFiles=".jpg,.jpeg,.png"
-                    multiple={false}
-                    onDrop={(acceptedFiles) =>
-                      setFieldValue("picture", acceptedFiles[0])
-                    }
-                    
-                 
-                  >
-                    {({ getRootProps, getInputProps }) => (
-                      <Box
-                        {...getRootProps()}
-                        p={1}
-                        sx={{
-                          "&:hover": { cursor: "pointer" },
-                          border: `1px dashed ${palette.primary.main}`,
-                          display: "flex",
-                          justifyContent: "center",
-                          alignItems: 'center',
-                         height: '100%'
-                        }}
-                      >
-                        <input {...getInputProps()} />
+  const onSetAvatar = async (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        setAvatarUrl(reader.result);
+      };
+    }
+  };
 
-                        {!values.picture ? (
-                          <p>Add picture here</p>
-                        ) : (
-                          <FlexBetweenBox>
-                            <Typography>{values.picture.name}</Typography>
-                            <EditOutlinedIcon />
-                          </FlexBetweenBox>
-                        )}
-                      </Box>
-                    )}
-                  </Dropzone>
-                </Box>
-              </>
-            ) : (
-              <>
-                <TextInput
-                  loginError={loginError}
-                  label="Email"
-                  name="email"
-                  id="email"
-                  sx={{ gridColumn: "span 2" }}
-                />
-                <div style={{ gridColumn: "span 2", position: "relative" }}>
-                  <PasswordInput
-                    showPassword={showPassword}
-                    toggleShowPassword={onToggleShowPassword}
-                    loginError={loginError}
+  const openPhotoModal = () => setIsPhotoModalOpen(true);
+  const closePhotoModal = () => setIsPhotoModalOpen(false);
+
+  return (
+    <>
+      <Formik
+        initialValues={initialValuesRegister}
+        validationSchema={isLogin ? loginSchema : registerSchema}
+        onSubmit={handleFormSubmit}
+      >
+        {({ values, errors, setFieldValue, resetForm }) => (
+          <Form>
+            <Box
+              display="grid"
+              rowGap="25px"
+              gridTemplateColumns="repeat(2, 1fr)"
+              sx={{
+                "& > div": { gridColumn: isNonMobile ? undefined : "span 2" },
+              }}
+            >
+              {isRegister ? (
+                <>
+                  <Box gridColumn="1">
+                    <TextInput
+                      label="First name"
+                      name="firstName"
+                      id="firstName"
+                      sx={{ marginBottom: "25px", width: "100%" }}
+                    />
+                    <TextInput
+                      label="Last name"
+                      name="lastName"
+                      id="lastName"
+                      sx={{ width: "100%" }}
+                    />
+                  </Box>
+                  <Box
+                    gridColumn="2"
+                    sx={{
+                      height: "130px",
+                      display: "flex",
+                      justifyContent: `${isNonMobile ? "flex-end" : "center"}`,
+                      alignItems: "center",
+                      gap: "15px",
+                      order: `${!isNonMobile ? "-1" : "0"}`,
+                    }}
+                  >
+                    <Box
+                      width="110px"
+                      height="110px"
+                      sx={{
+                        boxShadow: `0px 0px 6px ${palette.primary.main}`,
+                        borderRadius: "50%",
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      {avatarUrl ? (
+                        <img
+                          src={avatarUrl}
+                          alt="user"
+                          style={{
+                            objectFit: "cover",
+                            borderRadius: "50%",
+                            cursor: "pointer",
+                          }}
+                          width="120px"
+                          height="120px"
+                          onClick={openPhotoModal}
+                        />
+                      ) : (
+                        <>
+                          {errors.picture ? (
+                            <Typography
+                              variant="subtitle1"
+                              sx={{ userSelect: "none", color: "#d32f2f" }}
+                            >
+                              Require
+                            </Typography>
+                          ) : (
+                            <Typography
+                              variant="subtitle2"
+                              sx={{ userSelect: "none" }}
+                            >
+                              Add photo
+                            </Typography>
+                          )}
+                        </>
+                      )}
+                    </Box>
+                    <IconButton
+                      component="label"
+                      htmlFor="picture"
+                      sx={{ marginRight: "10px" }}
+                    >
+                      <AddAPhoto
+                        sx={{
+                          "&:hover": {
+                            color: palette.primary.main,
+                            cursor: "pointer",
+                          },
+                        }}
+                      />
+                      <input
+                        label="picture"
+                        name="picture"
+                        id="picture"
+                        type="file"
+                        hidden
+                        accept="image/png, image/jpg, image/jpeg"
+                        onChange={(e) => {
+                          onSetAvatar(e);
+                          setFieldValue("picture", e.target.files[0]);
+                        }}
+                      />
+                    </IconButton>
+                  </Box>
+                  <TextInput
+                    userExist={userExist}
+                    label="Email"
+                    name="email"
+                    id="email"
+                    sx={{ gridColumn: "span 2" }}
                   />
-                </div>
-              </>
-            )}
-          </Box>
-          <Box>
-            <Button
-              fullWidth
-              type="submit"
-              sx={{
-                mt: "30px",
-                backgroundColor: palette.primary.light,
-                color: palette.background.default,
-                "&:hover": {
-                  backgroundColor: palette.primary.main,
-                },
-              }}
-            >
-              {isRegister ? "Register" : "Login"}
-            </Button>
-            <Typography
-              onClick={() => {
-                setPageType(isLogin ? "register" : "login");
-                resetForm();
-              }}
-              sx={{
-                mt: "5px",
-                color: palette.primary.main,
-                textDecoration: "underline",
-                "&:hover": {
-                  color: palette.primary.light,
-                  cursor: "pointer",
-                },
-              }}
-            >
-              {isLogin
-                ? "Don't have an account? Sign up here."
-                : "Already have an account? Login here."}
-            </Typography>
-          </Box>
-        </Form>
+                  <div style={{ gridColumn: "span 2", position: "relative" }}>
+                    <PasswordInput
+                      showPassword={showPassword}
+                      toggleShowPassword={onToggleShowPassword}
+                    />
+                  </div>
+                  <TextInput
+                    label="Location"
+                    name="location"
+                    id="location"
+                    sx={{ gridColumn: "span 2" }}
+                  />
+                  <TextInput
+                    label="Occupation"
+                    name="occupation"
+                    id="occupation"
+                    sx={{ gridColumn: "span 2" }}
+                  />
+                </>
+              ) : (
+                <>
+                  <TextInput
+                    loginError={loginError}
+                    label="Email"
+                    name="email"
+                    id="email"
+                    sx={{ gridColumn: "span 2" }}
+                  />
+                  <div style={{ gridColumn: "span 2", position: "relative" }}>
+                    <PasswordInput
+                      showPassword={showPassword}
+                      toggleShowPassword={onToggleShowPassword}
+                      loginError={loginError}
+                    />
+                  </div>
+                </>
+              )}
+            </Box>
+            <Box>
+              <Button
+                fullWidth
+                type="submit"
+                sx={{
+                  mt: "30px",
+                  backgroundColor: palette.primary.light,
+                  color: palette.background.default,
+                  "&:hover": {
+                    backgroundColor: palette.primary.main,
+                  },
+                }}
+              >
+                {isRegister ? "Register" : "Login"}
+              </Button>
+              <Typography
+                onClick={() => {
+                  setPageType(isLogin ? "register" : "login");
+                  resetForm();
+                }}
+                sx={{
+                  mt: "5px",
+                  color: palette.primary.main,
+                  textDecoration: "underline",
+                  "&:hover": {
+                    color: palette.primary.light,
+                    cursor: "pointer",
+                  },
+                }}
+              >
+                {isLogin
+                  ? "Don't have an account? Sign up here."
+                  : "Already have an account? Login here."}
+              </Typography>
+            </Box>
+          </Form>
+        )}
+      </Formik>
+      {isPhotoModalOpen && (
+        <PhotoModal
+          image={avatarUrl}
+          alt={"avatar"}
+          closeModal={closePhotoModal}
+          isInRegForm
+        />
       )}
-    </Formik>
+    </>
   );
 };
 

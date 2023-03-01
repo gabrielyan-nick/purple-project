@@ -20,26 +20,29 @@ const HomePage = () => {
       <Box
         width="100%"
         padding={`20px ${!isSmallScreens ? "50px" : "10px"} `}
-        display={isNonMobileScreens ? "flex" : "block"}
-        gap="15px"
+        display="flex"
+        flexDirection={`${isNonMobileScreens ? "row" : "column"}`}
+        gap="20px"
         justifyContent="space-between"
       >
         <Box flexBasis={isNonMobileScreens ? "26%" : undefined}>
           <UserWidget userId={_id} picturePath={picturePath} />
         </Box>
-        <Box
+        <Box 
           maxWidth={isNonMobileScreens ? "45%" : undefined}
           flexBasis={isNonMobileScreens ? "45%" : undefined}
-          mt={isNonMobileScreens ? undefined : "20px"}
+          // mt={isNonMobileScreens ? undefined : "20px"}
+          sx={{ order: `${!isNonMobileScreens ? "1" : "0"}` }}
         >
           <MyPostWidget picturePath={picturePath} />
           <PostsWidget userId={_id} />
         </Box>
-        {isNonMobileScreens && (
-          <Box flexBasis="26%">
-            <FriendListWidget userId={_id} />
-          </Box>
-        )}
+
+        <Box
+          flexBasis="26%"
+        >
+          <FriendListWidget userId={_id} />
+        </Box>
       </Box>
     </Box>
   );

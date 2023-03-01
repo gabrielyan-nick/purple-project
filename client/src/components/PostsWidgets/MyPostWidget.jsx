@@ -23,6 +23,7 @@ import {
   MicOutlined,
   MoreHorizOutlined,
 } from "@mui/icons-material";
+import { setPostsReloadFix } from "./postsWidgetsSlice";
 
 const MyPostWidget = ({ picturePath }) => {
   const dispatch = useDispatch();
@@ -33,6 +34,7 @@ const MyPostWidget = ({ picturePath }) => {
   const _id = useSelector((state) => state.auth.user._id);
   const token = useSelector((state) => state.auth.token);
   const initPosts = useSelector((state) => state.postsWidget.posts);
+
   const isNonMobileScreens = useMediaQuery("(min-width: 500px)");
   const imageNameArr = image?.name.split(".");
   const navigate = useNavigate();
@@ -52,6 +54,7 @@ const MyPostWidget = ({ picturePath }) => {
     dispatch(addMyPost({ formData, token, initPosts })).then(() => {
       setImage(null);
       setPost("");
+      dispatch(setPostsReloadFix());
     });
   };
 
@@ -64,7 +67,7 @@ const MyPostWidget = ({ picturePath }) => {
   };
 
   return (
-    <WidgetWrapper sx={{marginBottom: '20px'}}>
+    <WidgetWrapper sx={{ marginBottom: "20px" }}>
       <FlexBetweenBox gap="15px">
         <UserImage image={picturePath} navigate={onNavigate} />
         <InputBase
