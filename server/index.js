@@ -8,13 +8,9 @@ import helmet from "helmet";
 import morgan from "morgan";
 import path from "path";
 import { fileURLToPath } from "url";
-import { authRoutes, userRoutes, postRoutes } from "./routes/index.js";
-import { register, createPost } from "./controllers/index.js";
-import { changeAvatar } from "./controllers/users.js";
 import { verifyToken } from "./middleware/auth.js";
-import { users, posts } from "./data/index.js";
-import Post from "./models/Post.js";
-import User from "./models/User.js";
+import { authRoutes, userRoutes, postRoutes } from "./routes/index.js";
+import { changeAvatar } from "./controllers/users.js";
 
 // CONFIGURATION
 const __filename = fileURLToPath(import.meta.url);
@@ -40,16 +36,6 @@ const storage = multer.diskStorage({
   },
 });
 const upload = multer({ storage });
-
-// ROUTES WITH FILES
-app.post("/auth/register", upload.single("picture"), register);
-app.post("/posts", verifyToken, upload.single("picture"), createPost);
-app.patch(
-  "/users/:id/avatar",
-  verifyToken,
-  upload.single("picture"),
-  changeAvatar
-);
 
 // ROUTES
 app.use("/auth", authRoutes);

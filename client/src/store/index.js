@@ -8,7 +8,7 @@ const initialState = {
 
 export const updateUserData = createAsyncThunk(
   "user/updateUserData",
-  async ({ id, formData, token }) => {
+  async ({ id, formData, token, initData }) => {
     const response = await fetch(`http://localhost:3001/users/${id}`, {
       method: "PATCH",
       headers: {
@@ -17,7 +17,23 @@ export const updateUserData = createAsyncThunk(
       body: formData,
     });
     const user = await response.json();
-    if (user.message) return [];
+    if (user.message) return initData;
+    return user;
+  }
+);
+
+export const updateUserAvatar = createAsyncThunk(
+  "user/updateUserData",
+  async ({ id, formData, token, initData }) => {
+    const response = await fetch(`http://localhost:3001/users/${id}/avatar`, {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: formData,
+    });
+    const user = await response.json();
+    if (user.message) return initData;
     return user;
   }
 );

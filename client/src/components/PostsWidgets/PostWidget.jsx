@@ -173,7 +173,7 @@ const PostWidget = ({
 
         {picturePath && (
           <img
-            src={`http://localhost:3001/assets/${picturePath}`}
+            src={picturePath}
             alt="post"
             style={{
               width: "100%",

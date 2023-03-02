@@ -1,4 +1,6 @@
 import { React, useState, useEffect } from "react";
+import { ref, uploadBytes, getDownloadURL } from "@firebase/storage";
+import { storage } from "../firebase";
 import {
   Box,
   Button,
@@ -49,12 +51,14 @@ const RegisterForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [userExist, setUserExist] = useState(false);
   const [loginError, setLoginError] = useState(false);
+  const [registerError, setRegisterError] = useState(false);
   const { palette } = useTheme();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const isNonMobile = useMediaQuery("(min-width: 600px)");
   const isLogin = pageType === "login";
   const isRegister = pageType === "register";
+  const [avatar, setAvatar] = useState(null);
   const [avatarUrl, setAvatarUrl] = useState(null);
   const [isPhotoModalOpen, setIsPhotoModalOpen] = useState(false);
 
@@ -68,23 +72,50 @@ const RegisterForm = () => {
   };
 
   const register = async (values, onSubmitProps) => {
-    const formData = new FormData(); // Вручную формируем FormData, чтобы добавить изображение
-    for (let value in values) {
-      formData.append(value, values[value]);
-    }
-    formData.append("picturePath", values.picture.name);
+    const imageRef = ref(storage, `avatars/${avatar.name}`);
+    uploadBytes(imageRef, avatar)
+      .then(() => {
+        getDownloadURL(imageRef)
+          .then((url) => {
+            if (!avatar) {
+              console.log("Avatar file is missing or not yet uploaded");
+              return;
+            }
+            const formData = new FormData();
+            Object.keys(values).forEach((key) => {
+              if (key !== "picture") {
+                formData.append(key, values[key]);
+              }
+            });
+            formData.append("picturePath", url);
 
-    const savedUserResponse = await fetch(
-      "http://localhost:3001/auth/register",
-      { method: "POST", body: formData }
-    );
-    const savedUser = await savedUserResponse.json();
-
-    if (savedUser === "User already exist") setUserExist(true);
-    if (savedUser && savedUser !== "User already exist") {
-      onSubmitProps.resetForm();
-      setPageType("login");
-    }
+            fetch("http://localhost:3001/auth/register", {
+              method: "POST",
+              body: formData,
+            })
+              .then((res) => res.json())
+              .then((res) => {
+                if (res === "User already exist") setUserExist(true);
+                if (res.error) setRegisterError(true);
+                if (res && res !== "User already exist" && !res.error) {
+                  onSubmitProps.resetForm();
+                  setRegisterError(false);
+                  setPageType("login");
+                }
+              })
+              .catch((error) => {
+                setRegisterError(true);
+              });
+          })
+          .catch((error) => {
+            console.log(error.message, "error getting the image url");
+            setRegisterError(true);
+          });
+      })
+      .catch((error) => {
+        console.log(error.message);
+        setRegisterError(true);
+      });
   };
 
   const login = async (values, onSubmitProps) => {
@@ -112,6 +143,7 @@ const RegisterForm = () => {
 
   const onSetAvatar = async (e) => {
     const file = e.target.files[0];
+    setAvatar(file);
     if (file) {
       const reader = new FileReader();
       reader.readAsDataURL(file);
@@ -131,7 +163,7 @@ const RegisterForm = () => {
         validationSchema={isLogin ? loginSchema : registerSchema}
         onSubmit={handleFormSubmit}
       >
-        {({ values, errors, setFieldValue, resetForm }) => (
+        {({ values, errors, touched, setFieldValue, resetForm }) => (
           <Form>
             <Box
               display="grid"
@@ -194,7 +226,7 @@ const RegisterForm = () => {
                         />
                       ) : (
                         <>
-                          {errors.picture ? (
+                          {errors.picture && touched.picture ? (
                             <Typography
                               variant="subtitle1"
                               sx={{ userSelect: "none", color: "#d32f2f" }}
@@ -232,10 +264,7 @@ const RegisterForm = () => {
                         type="file"
                         hidden
                         accept="image/png, image/jpg, image/jpeg"
-                        onChange={(e) => {
-                          onSetAvatar(e);
-                          setFieldValue("picture", e.target.files[0]);
-                        }}
+                        onChange={onSetAvatar}
                       />
                     </IconButton>
                   </Box>
@@ -284,7 +313,20 @@ const RegisterForm = () => {
                 </>
               )}
             </Box>
-            <Box>
+            <Box sx={{ position: "relative" }}>
+              {registerError && (
+                <Typography
+                  color="#d32f2f"
+                  sx={{
+                    position: "absolute",
+                    top: "4px",
+                    left: "20%",
+                    width: "70%",
+                  }}
+                >
+                  Oops...something went wrong. Try once more
+                </Typography>
+              )}
               <Button
                 fullWidth
                 type="submit"
@@ -303,6 +345,7 @@ const RegisterForm = () => {
                 onClick={() => {
                   setPageType(isLogin ? "register" : "login");
                   resetForm();
+                  setRegisterError(false);
                 }}
                 sx={{
                   mt: "5px",

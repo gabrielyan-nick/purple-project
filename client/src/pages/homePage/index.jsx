@@ -31,7 +31,6 @@ const HomePage = () => {
         <Box 
           maxWidth={isNonMobileScreens ? "45%" : undefined}
           flexBasis={isNonMobileScreens ? "45%" : undefined}
-          // mt={isNonMobileScreens ? undefined : "20px"}
           sx={{ order: `${!isNonMobileScreens ? "1" : "0"}` }}
         >
           <MyPostWidget picturePath={picturePath} />

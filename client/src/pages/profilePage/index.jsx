@@ -58,7 +58,7 @@ const ProfilePage = () => {
         </Box>
         {isNonMobileScreens && (
           <Box flexBasis="26%">
-            <FriendListWidget userId={userId} isMyList={false} />
+            <FriendListWidget userId={userId} />
           </Box>
         )}
       </Box>

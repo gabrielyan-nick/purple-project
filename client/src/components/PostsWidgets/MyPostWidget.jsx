@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { ref, uploadBytes, getDownloadURL } from "@firebase/storage";
+import { storage } from "../../firebase";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { addMyPost } from "./postsWidgetsSlice";
@@ -28,34 +30,61 @@ import { setPostsReloadFix } from "./postsWidgetsSlice";
 const MyPostWidget = ({ picturePath }) => {
   const dispatch = useDispatch();
   const [image, setImage] = useState(null);
+  const [imageUrl, setImageUrl] = useState("");
   const [post, setPost] = useState("");
   const [anchorEl, setAnchorEl] = useState(null);
   const { palette } = useTheme();
   const _id = useSelector((state) => state.auth.user._id);
   const token = useSelector((state) => state.auth.token);
   const initPosts = useSelector((state) => state.postsWidget.posts);
-
   const isNonMobileScreens = useMediaQuery("(min-width: 500px)");
-  const imageNameArr = image?.name.split(".");
   const navigate = useNavigate();
 
   const onNavigate = () => {
     navigate(`/profile/${_id}`);
   };
 
-  const handlePost = () => {
+  const onAddImage = async (e) => {
+    const img = e.target.files[0];
+    setImage(img);
+    if (img) {
+      const reader = new FileReader();
+      reader.readAsDataURL(img);
+      reader.onload = () => {
+        setImageUrl(reader.result);
+      };
+    }
+  };
+
+  const addPost = async (url = false) => {
     const formData = new FormData();
     formData.append("userId", _id);
     formData.append("description", post);
-    if (image) {
-      formData.append("picture", image);
-      formData.append("picturePath", image.name);
+    if (url) {
+      formData.append("picturePath", url);
     }
     dispatch(addMyPost({ formData, token, initPosts })).then(() => {
       setImage(null);
       setPost("");
       dispatch(setPostsReloadFix());
     });
+  };
+
+  const handlePost = () => {
+    if (image) {
+      const imageRef = ref(storage, `${_id}/${image.name}`);
+      uploadBytes(imageRef, image)
+        .then(() => {
+          getDownloadURL(imageRef)
+            .then((url) => {
+              addPost(url);
+            })
+            .catch((error) => console.log(error));
+        })
+        .catch((error) => console.log(error));
+    } else {
+      addPost();
+    }
   };
 
   const handleClickPopover = (e) => {
@@ -95,11 +124,11 @@ const MyPostWidget = ({ picturePath }) => {
               gap: "5px",
             }}
           >
-            <Typography>
-              {imageNameArr[0].length > 40
-                ? imageNameArr[0].slice(0, 40) + "..." + imageNameArr[1]
-                : image.name}
-            </Typography>
+            <img
+              src={imageUrl}
+              alt={image.name.slice(0, 20)}
+              style={{ maxWidth: "200px" }}
+            />
 
             <IconButton onClick={() => setImage(null)}>
               <DeleteOutlined sx={{ color: palette.primary.main }} />
@@ -124,7 +153,7 @@ const MyPostWidget = ({ picturePath }) => {
             type="file"
             hidden
             accept="image/png, image/jpg, image/jpeg"
-            onChange={(e) => setImage(e.target.files[0])}
+            onChange={onAddImage}
           />
         </Button>
 

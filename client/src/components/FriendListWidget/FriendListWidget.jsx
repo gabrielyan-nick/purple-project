@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getMyFriendList } from "../../store";
 import { getFriendList } from "./friendListWidgetSlice";
 
-const FriendListWidget = ({ userId, isMyList = true }) => {
+const FriendListWidget = ({ userId }) => {
   const [showAll, setShowAll] = useState(false);
   const dispatch = useDispatch();
   const { palette } = useTheme();
@@ -13,11 +13,12 @@ const FriendListWidget = ({ userId, isMyList = true }) => {
   const { friendList, listFixState } = useSelector(
     (state) => state.friendListWidget
   );
-  const { friends } = useSelector((state) => state.auth.user);
+  const { friends, _id } = useSelector((state) => state.auth.user);
+  const isMyList = _id === userId;
   const currentFriends = isMyList ? friends : friendList;
   const displayedFriends = showAll
-    ? currentFriends
-    : currentFriends.slice(0, 5);
+  ? currentFriends
+  : currentFriends.slice(0, 5);
 
   useEffect(() => {
     isMyList

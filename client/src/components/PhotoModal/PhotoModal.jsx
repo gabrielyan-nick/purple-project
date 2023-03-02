@@ -4,7 +4,7 @@ import { Close } from "@mui/icons-material";
 import useOnClickOutside from "hooks/useOnClickOutside";
 import "./styles.scss";
 
-const PhotoModal = ({ image, alt = "post image", closeModal, isInRegForm = false }) => {
+const PhotoModal = ({ image, alt = "post image", closeModal }) => {
   const isNonMobileScreens = useMediaQuery("(min-width: 600px)");
   const imgRef = useRef(null);
   const modalRef = useRef(null);
@@ -30,15 +30,13 @@ const PhotoModal = ({ image, alt = "post image", closeModal, isInRegForm = false
     return () => {
       window.removeEventListener("resize", getModalSize);
     };
-    
   }, []);
 
   useEffect(() => {
     document.addEventListener("keydown", handleKeyDown);
     return () => {
-        document.removeEventListener("keydown", handleKeyDown);
+      document.removeEventListener("keydown", handleKeyDown);
     };
-    
   }, []);
 
   const hiddenOutsideElements = () => {
@@ -69,12 +67,9 @@ const PhotoModal = ({ image, alt = "post image", closeModal, isInRegForm = false
 
   return (
     <div className="photo-modal">
-      <div
-        className="photo-modal-content"
-        ref={modalRef}
-      >
+      <div className="photo-modal-content" ref={modalRef}>
         <img
-          src={`${isInRegForm ? `${image}` : `http://localhost:3001/assets/${image}`}`}
+          src={image}
           alt={alt}
           ref={imgRef}
           style={{ maxHeight: `${isNonMobileScreens ? "96vh" : "92vh"}` }}
@@ -97,5 +92,3 @@ const PhotoModal = ({ image, alt = "post image", closeModal, isInRegForm = false
 };
 
 export default PhotoModal;
-
-

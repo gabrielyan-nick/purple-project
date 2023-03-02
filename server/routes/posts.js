@@ -1,4 +1,5 @@
 import express from "express";
+import multer from "multer";
 import {
   getFeedPosts,
   getUserPosts,
@@ -8,10 +9,12 @@ import {
   deletePost,
   updatePost,
   updateComment,
+  createPost,
 } from "../controllers/posts.js";
 import { verifyToken } from "../middleware/auth.js";
 
 const router = express.Router();
+const upload = multer();
 
 // READ
 router.get("/", verifyToken, getFeedPosts);
@@ -28,6 +31,9 @@ router.delete("/:postId/comment/:commentId", verifyToken, deleteComment);
 
 // UPDATE COMMENT
 router.put("/:postId/comment/:commentId", verifyToken, updateComment);
+
+// CREATE POST
+router.post("/", verifyToken, upload.none(), createPost);
 
 // DELETE POST
 router.delete("/:postId", verifyToken, deletePost);

@@ -1,3 +1,5 @@
+import { ref, uploadBytes, getDownloadURL } from "@firebase/storage";
+import { storage } from "../../firebase";
 import {
   ManageAccountsOutlined,
   EditOutlined,
@@ -25,7 +27,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { fetchUserData, setUserFix } from "./userWidgetSlice";
-import { patchFriend, updateUserData } from "../../store";
+import { patchFriend, updateUserData, updateUserAvatar } from "../../store";
 import { setListFix } from "components/FriendListWidget/friendListWidgetSlice";
 import { setPostsReloadFix } from "components/PostsWidgets/postsWidgetsSlice";
 
@@ -96,7 +98,6 @@ const UserWidget = ({ userId, picturePath }) => {
     ).then(() => {
       setPatchFriendStatus("idle");
       dispatch(setListFix());
-      // navigate(0);
     });
   };
 
@@ -112,7 +113,14 @@ const UserWidget = ({ userId, picturePath }) => {
     const formData = new FormData();
     formData.append("location", locationEditedText);
     formData.append("occupation", occupation);
-    dispatch(updateUserData({ id: loggedInUser._id, formData, token }));
+    dispatch(
+      updateUserData({
+        id: loggedInUser._id,
+        formData,
+        token,
+        initData: loggedInUser,
+      })
+    );
     setIsLocationEdited(false);
     dispatch(setUserFix());
     dispatch(setListFix());
@@ -122,7 +130,14 @@ const UserWidget = ({ userId, picturePath }) => {
     const formData = new FormData();
     formData.append("location", location);
     formData.append("occupation", occupationEditedText);
-    dispatch(updateUserData({ id: loggedInUser._id, formData, token }));
+    dispatch(
+      updateUserData({
+        id: loggedInUser._id,
+        formData,
+        token,
+        initData: loggedInUser,
+      })
+    );
     setIsOccupationEdited(false);
     dispatch(setUserFix());
     dispatch(setListFix());
@@ -140,18 +155,33 @@ const UserWidget = ({ userId, picturePath }) => {
     }
   };
 
-  const onSaveChangedAvatar = () => {
-    const formData = new FormData();
-    formData.append("picture", changedAvatar);
-    formData.append("picturePath", changedAvatar.name);
-    dispatch(
-      updateUserData({ id: `${loggedInUser._id}/avatar`, formData, token })
-    ).then(() => {
-      setChangedAvatar(null);
-      setChangedAvatarUrl(null);
-      dispatch(setListFix());
-      dispatch(setPostsReloadFix());
-    });
+  const onSaveChangedAvatar = async () => {
+    const imageRef = ref(storage, `${loggedInUser._id}/${changedAvatar.name}`);
+    uploadBytes(imageRef, changedAvatar)
+      .then(() => {
+        getDownloadURL(imageRef)
+          .then((url) => {
+            const formData = new FormData();
+            formData.append("picturePath", url);
+           
+            dispatch(
+              updateUserAvatar({
+                id: loggedInUser._id,
+                formData,
+                token,
+                initData: loggedInUser,
+              })
+            ).then(() => {
+              console.log(loggedInUser._id)
+              setChangedAvatar(null);
+              setChangedAvatarUrl(null);
+              dispatch(setListFix());
+              dispatch(setPostsReloadFix());
+            });
+          })
+          .catch((error) => console.log(error));
+      })
+      .catch((error) => console.log(error));
   };
 
   const onCancelChangeAvatar = () => {
@@ -175,7 +205,7 @@ const UserWidget = ({ userId, picturePath }) => {
               <img
                 src={`${
                   changedAvatar === null
-                    ? `http://localhost:3001/assets/${currentUser.picturePath}`
+                    ? currentUser.picturePath
                     : changedAvatarUrl
                 } `}
                 alt="user"
