@@ -22,23 +22,6 @@ export const updateUserData = createAsyncThunk(
   }
 );
 
-export const updateUserAvatar = createAsyncThunk(
-  "user/updateUserData",
-  async ({ id, formData, token, initData }) => {
-    const response = await fetch(`http://localhost:3001/users/${id}/avatar`, {
-      method: "PATCH",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      body: formData,
-    });
-    const user = await response.json();
-    if (user.message) return initData;
-    return user;
-  }
-);
-
-
 export const patchFriend = createAsyncThunk(
   "user/patchFriend",
   async ({ _id, friendId, token }) => {
@@ -104,6 +87,7 @@ const authSlice = createSlice({
       .addCase(getMyFriendList.fulfilled, (state, action) => {
         state.user.friends = action.payload;
       })
+      .addCase(updateUserData.pending, (state) => {})
       .addCase(updateUserData.fulfilled, (state, action) => {
         state.user = action.payload;
       });

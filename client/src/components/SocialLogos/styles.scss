@@ -1,0 +1,24 @@
+$logo-color: #6e6088;
+
+.fb1 {
+  fill: $logo-color;
+  fill-rule: nonzero;
+  transition: all 0.3s;
+}
+.fb2 {
+  fill: #fff;
+  fill-rule: nonzero;
+  fill-opacity: 0;
+  transition: all 0.3s;
+}
+
+.social-link-wrapper {
+  &:hover {
+    .fb1 {
+      fill: #1877f2;
+    }
+    .fb2 {
+      fill-opacity: 1;
+    }
+  }
+}

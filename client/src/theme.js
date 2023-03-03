@@ -23,15 +23,15 @@ export const themeSettings = (mode) => {
             },
             buttons: {
               main: "#38006b",
-              // hover: 
+              hover: "#540254",
             },
             skeleton: {
               background: "#221646",
               foreground: "#392c61",
             },
             boxShadow: {
-              default: '#4a078098'
-            }
+              default: "#4a078098",
+            },
           }
         : {
             // palette values for light mode
@@ -52,14 +52,15 @@ export const themeSettings = (mode) => {
             },
             buttons: {
               main: "#12005e",
+              hover: "#c8bbd9",
             },
             skeleton: {
               background: "#debeec",
               foreground: "#E6FFF7",
             },
             boxShadow: {
-              default: '#0568458e'
-            }
+              default: "#0568458e",
+            },
           }),
     },
     typography: {

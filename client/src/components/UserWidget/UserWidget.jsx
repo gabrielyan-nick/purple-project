@@ -1,10 +1,6 @@
 import { ref, uploadBytes, getDownloadURL } from "@firebase/storage";
 import { storage } from "../../firebase";
 import {
-  ManageAccountsOutlined,
-  EditOutlined,
-  LocationOnOutlined,
-  WorkOutlineOutlined,
   PersonRemoveOutlined,
   PersonAddOutlined,
   Edit,
@@ -22,67 +18,46 @@ import {
   IconButton,
   InputBase,
 } from "@mui/material";
-import { FlexBetweenBox, WidgetWrapper, PhotoModal } from "components";
+import {
+  FlexBetweenBox,
+  WidgetWrapper,
+  PhotoModal,
+  UserWidgetInput,
+  UserSocialLinks,
+} from "components";
 import { useSelector, useDispatch } from "react-redux";
 import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { fetchUserData, setUserFix } from "./userWidgetSlice";
-import { patchFriend, updateUserData, updateUserAvatar } from "../../store";
+import { patchFriend, updateUserData } from "../../store";
 import { setListFix } from "components/FriendListWidget/friendListWidgetSlice";
 import { setPostsReloadFix } from "components/PostsWidgets/postsWidgetsSlice";
 
 const UserWidget = ({ userId, picturePath }) => {
   const user = useSelector((state) => state.userWidget.userData);
   const loggedInUser = useSelector((state) => state.auth.user);
+  const { token } = useSelector((state) => state.auth);
   const isMyUserWidget = loggedInUser._id === userId;
   const currentUser = isMyUserWidget ? loggedInUser : user;
   const { firstName, lastName, location, occupation } = user;
   const [changedAvatar, setChangedAvatar] = useState(null);
   const [changedAvatarUrl, setChangedAvatarUrl] = useState(null);
-  const [locationEditedText, setLocationEditedText] = useState(
-    loggedInUser.location
-  );
-  const [occupationEditedText, setOccupationEditedText] = useState(
-    loggedInUser.occupation
-  );
-  const [isLocationEdited, setIsLocationEdited] = useState(false);
-  const [isOccupationEdited, setIsOccupationEdited] = useState(false);
+  const [avatarLoadingStatus, setAvatarLoadingStatus] = useState("idle");
   const [isPhotoModalOpen, setIsPhotoModalOpen] = useState(false);
   const [patchFriendStatus, setPatchFriendStatus] = useState("idle");
   const { listFixState } = useSelector((state) => state.friendListWidget);
   const { userFixState } = useSelector((state) => state.userWidget);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { token } = useSelector((state) => state.auth);
   const userWidgetLoadingStatus = useSelector(
     (state) => state.userWidget.userLoadingStatus
   );
   const isFriend = !!loggedInUser.friends.find((user) => user._id === userId);
   const { palette } = useTheme();
-  const locationRef = useRef(null);
-  const occupationRef = useRef(null);
 
   useEffect(() => {
     dispatch(fetchUserData({ userId, token }));
   }, [userFixState, listFixState]);
-
-  useEffect(() => {
-    focusInputs(locationRef);
-  }, [isLocationEdited]);
-
-  useEffect(() => {
-    focusInputs(occupationRef);
-  }, [isOccupationEdited]);
-
-  const focusInputs = (ref) => {
-    if (ref.current) {
-      ref.current.focus();
-      ref.current.setSelectionRange(
-        ref.current.value.length,
-        ref.current.value.length
-      );
-    }
-  };
 
   const onNavigate = () => {
     navigate(`/profile/${userId}`);
@@ -99,48 +74,6 @@ const UserWidget = ({ userId, picturePath }) => {
       setPatchFriendStatus("idle");
       dispatch(setListFix());
     });
-  };
-
-  const onEditLocation = () => {
-    setIsLocationEdited(true);
-  };
-
-  const onEditOccupation = () => {
-    setIsOccupationEdited(true);
-  };
-
-  const onSaveEditedLocation = () => {
-    const formData = new FormData();
-    formData.append("location", locationEditedText);
-    formData.append("occupation", occupation);
-    dispatch(
-      updateUserData({
-        id: loggedInUser._id,
-        formData,
-        token,
-        initData: loggedInUser,
-      })
-    );
-    setIsLocationEdited(false);
-    dispatch(setUserFix());
-    dispatch(setListFix());
-  };
-
-  const onSaveEditedOccupation = () => {
-    const formData = new FormData();
-    formData.append("location", location);
-    formData.append("occupation", occupationEditedText);
-    dispatch(
-      updateUserData({
-        id: loggedInUser._id,
-        formData,
-        token,
-        initData: loggedInUser,
-      })
-    );
-    setIsOccupationEdited(false);
-    dispatch(setUserFix());
-    dispatch(setListFix());
   };
 
   const onChangeAvatar = (e) => {
@@ -163,16 +96,16 @@ const UserWidget = ({ userId, picturePath }) => {
           .then((url) => {
             const formData = new FormData();
             formData.append("picturePath", url);
-           
+            setAvatarLoadingStatus("loading");
             dispatch(
-              updateUserAvatar({
-                id: loggedInUser._id,
+              updateUserData({
+                id: `${loggedInUser._id}/avatar`,
                 formData,
                 token,
                 initData: loggedInUser,
               })
             ).then(() => {
-              console.log(loggedInUser._id)
+              setAvatarLoadingStatus("idle");
               setChangedAvatar(null);
               setChangedAvatarUrl(null);
               dispatch(setListFix());
@@ -236,7 +169,9 @@ const UserWidget = ({ userId, picturePath }) => {
               </Typography>
             </Box>
           </FlexBetweenBox>
-          {isMyUserWidget && changedAvatar === null ? (
+          {avatarLoadingStatus === "loading" ? (
+            <CircularProgress size={30} />
+          ) : isMyUserWidget && changedAvatar === null ? (
             <IconButton component="label">
               <AddAPhoto
                 sx={{
@@ -308,132 +243,31 @@ const UserWidget = ({ userId, picturePath }) => {
         <Divider />
         {/* SECOND ROW */}
         <Box py="10px">
-          <FlexBetweenBox gap="10px" mb="5px">
-            <Box
-              display="flex"
-              alignItems="center"
-              gap="10px"
-              sx={{ width: "90%", height: "28px" }}
-            >
-              <LocationOnOutlined sx={{ color: palette.primary.main }} />
-
-              {isMyUserWidget && isLocationEdited ? (
-                <InputBase
-                  inputRef={locationRef}
-                  onChange={(e) => setLocationEditedText(e.target.value)}
-                  value={locationEditedText}
-                  sx={{
-                    width: "100%",
-                    backgroundColor: "transparent",
-                    paddingLeft: "10px",
-                    borderRadius: "15px",
-                    boxShadow: `0px 0px 6px ${palette.primary.main}`,
-                  }}
-                />
-              ) : (
-                <Typography>{location}</Typography>
-              )}
-            </Box>
-
-            {isMyUserWidget && !isLocationEdited ? (
-              <IconButton onClick={onEditLocation} sx={{ padding: "3px" }}>
-                <Edit sx={{ "&:hover": { color: palette.primary.main } }} />
-              </IconButton>
-            ) : isMyUserWidget && isLocationEdited ? (
-              <IconButton
-                onClick={onSaveEditedLocation}
-                sx={{ padding: "3px" }}
-              >
-                <Save sx={{ "&:hover": { color: palette.primary.main } }} />
-              </IconButton>
-            ) : null}
-          </FlexBetweenBox>
-
-          <FlexBetweenBox gap="10px">
-            <Box
-              display="flex"
-              alignItems="center"
-              gap="10px"
-              sx={{ width: "90%", height: "28px" }}
-            >
-              <WorkOutlineOutlined sx={{ color: palette.primary.main }} />
-
-              {isMyUserWidget && isOccupationEdited ? (
-                <InputBase
-                  inputRef={occupationRef}
-                  onChange={(e) => setOccupationEditedText(e.target.value)}
-                  value={occupationEditedText}
-                  sx={{
-                    width: "100%",
-                    backgroundColor: "transparent",
-                    paddingLeft: "10px",
-                    borderRadius: "15px",
-                    boxShadow: `0px 0px 6px ${palette.primary.main}`,
-                  }}
-                />
-              ) : (
-                <Typography>{occupation}</Typography>
-              )}
-            </Box>
-
-            {isMyUserWidget && !isOccupationEdited ? (
-              <IconButton onClick={onEditOccupation} sx={{ padding: "3px" }}>
-                <Edit sx={{ "&:hover": { color: palette.primary.main } }} />
-              </IconButton>
-            ) : isMyUserWidget && isOccupationEdited ? (
-              <IconButton
-                onClick={onSaveEditedOccupation}
-                sx={{ padding: "3px" }}
-              >
-                <Save sx={{ "&:hover": { color: palette.primary.main } }} />
-              </IconButton>
-            ) : null}
-          </FlexBetweenBox>
+          <UserWidgetInput
+            userId={userId}
+            displayedInfo={location}
+            initText={loggedInUser.location}
+            typeOfData="location"
+          />
+          <UserWidgetInput
+            userId={userId}
+            displayedInfo={occupation}
+            initText={loggedInUser.occupation}
+            typeOfData="occupation"
+          />
         </Box>
         <Divider />
         {/* THIRD ROW */}
-        <Box py="10px">
-          <Typography fontWeight="500" mb="10px">
-            Social profiles
-          </Typography>
-
-          <FlexBetweenBox gap="10px" mb="10px">
-            <FlexBetweenBox gap="10px">
-              <img
-                src="../assets/twitter.png"
-                alt="twitter"
-                style={{ cursor: "pointer" }}
-              />
-              <Box>
-                <Typography fontWeight="500" sx={{ cursor: "pointer" }}>
-                  Twitter
-                </Typography>
-                <Typography>Social network</Typography>
-              </Box>
-            </FlexBetweenBox>
-          </FlexBetweenBox>
-
-          <FlexBetweenBox gap="10px">
-            <FlexBetweenBox gap="10px">
-              <img
-                src="../assets/linkedin.png"
-                alt="linkedin"
-                style={{ cursor: "pointer" }}
-              />
-              <Box>
-                <Typography fontWeight="500" sx={{ cursor: "pointer" }}>
-                  LindedIn
-                </Typography>
-                <Typography>Network platform</Typography>
-              </Box>
-            </FlexBetweenBox>
-          </FlexBetweenBox>
-        </Box>
+        <UserSocialLinks links={user.socialLinks} userId={userId} />
       </WidgetWrapper>
 
       {isPhotoModalOpen && (
         <PhotoModal
-          image={currentUser.picturePath}
+          image={
+            changedAvatarUrl !== null
+              ? changedAvatarUrl
+              : currentUser.picturePath
+          }
           alt={currentUser.firstName}
           closeModal={closePhotoModal}
         />
