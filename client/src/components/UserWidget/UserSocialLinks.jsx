@@ -18,6 +18,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { updateUserData } from "../../store";
 import { setListFix } from "components/FriendListWidget/friendListWidgetSlice";
 import { setUserFix } from "./userWidgetSlice";
+import { fixUrl, getSocialNetwork } from "utils";
 
 const UserSocialLinks = ({ links, userId }) => {
   const loggedInUser = useSelector((state) => state.auth.user);
@@ -54,7 +55,7 @@ const UserSocialLinks = ({ links, userId }) => {
   };
 
   const onSaveLink = () => {
-    const parsedLink = parseUrl(linkEditedText);
+    const parsedLink = parseUrl(fixUrl(linkEditedText));
     const linkName = getSocialNetwork(parsedLink.hostname);
     const formData = new FormData();
 
@@ -63,7 +64,10 @@ const UserSocialLinks = ({ links, userId }) => {
       formData.append(`socialLinks[${i}][link]`, link.link);
     });
     formData.append(`socialLinks[${links.length}][name]`, linkName);
-    formData.append(`socialLinks[${links.length}][link]`, linkEditedText);
+    formData.append(
+      `socialLinks[${links.length}][link]`,
+      fixUrl(linkEditedText)
+    );
 
     setSaveLoadingStatus("loading");
     dispatch(
@@ -89,12 +93,12 @@ const UserSocialLinks = ({ links, userId }) => {
       <Typography fontWeight="500">Social profiles</Typography>
 
       <Box>
-        {links.length === 0 ? (
+        {links?.length === 0 ? (
           <Typography mt="10px" variant="subtitle1" color="grey">
             No links
           </Typography>
         ) : (
-          links.map((link, i) => (
+          links?.map((link, i) => (
             <SocialLink
               key={`${link}-${i}`}
               links={links}
@@ -162,35 +166,3 @@ const UserSocialLinks = ({ links, userId }) => {
 };
 
 export default UserSocialLinks;
-
-const getSocialNetwork = (domain) => {
-  switch (domain) {
-    case "facebook.com":
-    case "uk-ua.facebook.com":
-      return "Facebook";
-    case "twitter.com":
-      return "Twitter";
-    case "www.instagram.com":
-      return "Instagram";
-    case "linkedin.com":
-      return "LinkedIn";
-    case "tiktok.com":
-      return "TikTok";
-    case "pinterest.com":
-      return "Pinterest";
-    case "youtube.com":
-      return "YouTube";
-    case "tumblr.com":
-      return "Tumblr";
-    case "snapchat.com":
-      return "Snapchat";
-    case "reddit.com":
-      return "Reddit";
-    case "discord.com":
-      return "Discord";
-    case "github.com":
-      return "GitHub";
-    default:
-      return "Social link";
-  }
-};

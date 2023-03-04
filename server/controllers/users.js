@@ -66,15 +66,25 @@ export const addRemoveFriend = async (req, res) => {
 export const updateUserInfo = async (req, res) => {
   try {
     const { id } = req.params;
-    const { location, occupation } = req.body;
-    const updatedUser = await User.findByIdAndUpdate(
-      id,
-      {
-        location,
-        occupation,
-      },
-      { new: true }
-    );
+    const { socialLinks, ...data } = req.body;
+    let updatedUser;
+    if ("socialLinks" in req.body) {
+      updatedUser = await User.findByIdAndUpdate(
+        id,
+        {
+          socialLinks: socialLinks || [],
+        },
+        { new: true }
+      ); // Костыль для удаления всех socialLinks. При удалении единственной ссылки, отправляем [] в formData с фронта, здесь проверяем. Без проверки в socialLinks поместится ''.
+    } else {
+      updatedUser = await User.findByIdAndUpdate(
+        id,
+        {
+          ...data,
+        },
+        { new: true }
+      );
+    }
     res.status(200).json(updatedUser);
   } catch (error) {
     res.status(409).json({ message: error.message });

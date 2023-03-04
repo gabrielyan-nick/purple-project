@@ -16,4 +16,4 @@ export { default as PhotoModal } from "./PhotoModal/PhotoModal";
 export { default as UserWidgetInput } from "./UserWidget/UserWidgetInput";
 export { default as UserSocialLinks } from "./UserWidget/UserSocialLinks";
 export { default as SocialLink } from "./UserWidget/SocialLink";
-export { default as SocialLogos } from "./SocialLogos/SocialLogos";
+export { default as SocialLogos } from "./SocialLogos";

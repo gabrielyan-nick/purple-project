@@ -32,6 +32,9 @@ export const themeSettings = (mode) => {
             boxShadow: {
               default: "#4a078098",
             },
+            logos: {
+              primary: "#595364",
+            },
           }
         : {
             // palette values for light mode
@@ -60,6 +63,9 @@ export const themeSettings = (mode) => {
             },
             boxShadow: {
               default: "#0568458e",
+            },
+            logos: {
+              primary: "#6a627a",
             },
           }),
     },
