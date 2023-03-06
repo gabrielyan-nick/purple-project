@@ -7,6 +7,7 @@ import {
   MyPostWidget,
   PostsWidget,
   FriendListWidget,
+  ErrorBoundary,
 } from "components";
 
 const HomePage = () => {
@@ -26,21 +27,30 @@ const HomePage = () => {
         justifyContent="space-between"
       >
         <Box flexBasis={isNonMobileScreens ? "26%" : undefined}>
-          <UserWidget userId={_id} picturePath={picturePath} />
+          <ErrorBoundary>
+            <UserWidget userId={_id} picturePath={picturePath} />
+          </ErrorBoundary>
         </Box>
-        <Box 
+        <Box
+          display="flex"
+          flexDirection="column"
+          gap="20px"
           maxWidth={isNonMobileScreens ? "45%" : undefined}
           flexBasis={isNonMobileScreens ? "45%" : undefined}
           sx={{ order: `${!isNonMobileScreens ? "1" : "0"}` }}
         >
-          <MyPostWidget picturePath={picturePath} />
-          <PostsWidget userId={_id} />
+          <ErrorBoundary>
+            <MyPostWidget picturePath={picturePath} />
+          </ErrorBoundary>
+          <ErrorBoundary>
+            <PostsWidget userId={_id} />
+          </ErrorBoundary>
         </Box>
 
-        <Box
-          flexBasis="26%"
-        >
-          <FriendListWidget userId={_id} />
+        <Box flexBasis="26%">
+          <ErrorBoundary>
+            <FriendListWidget userId={_id} />
+          </ErrorBoundary>
         </Box>
       </Box>
     </Box>

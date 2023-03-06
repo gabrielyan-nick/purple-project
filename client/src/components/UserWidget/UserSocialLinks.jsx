@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import parseUrl from "url-parse";
+import { TransitionGroup } from "react-transition-group";
 import { Link } from "react-router-dom";
 import { Edit, Save, Close } from "@mui/icons-material";
 import {
@@ -98,14 +99,16 @@ const UserSocialLinks = ({ links, userId }) => {
             No links
           </Typography>
         ) : (
-          links?.map((link, i) => (
-            <SocialLink
-              key={`${link}-${i}`}
-              links={links}
-              link={link}
-              userId={userId}
-            />
-          ))
+          <Box mt="10px" display="flex" flexDirection="column" gap="7px">
+            {links?.map((link, i) => (
+              <SocialLink
+                key={`${link}-${i}`}
+                links={links}
+                link={link}
+                userId={userId}
+              />
+            ))}
+          </Box>
         )}
       </Box>
 
@@ -118,7 +121,7 @@ const UserSocialLinks = ({ links, userId }) => {
               variant="text"
               sx={{
                 "&:hover": { backgroundColor: palette.buttons.hover },
-                marginTop: "5px",
+                marginTop: "10px",
               }}
               onClick={onAddLink}
             >

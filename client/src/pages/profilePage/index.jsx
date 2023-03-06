@@ -8,6 +8,7 @@ import {
   MyPostWidget,
   PostsWidget,
   FriendListWidget,
+  ErrorBoundary,
 } from "components";
 
 const ProfilePage = () => {
@@ -47,18 +48,24 @@ const ProfilePage = () => {
         justifyContent="space-between"
       >
         <Box flexBasis={isNonMobileScreens ? "26%" : undefined}>
-          <UserWidget userId={userId} picturePath={user.picturePath} />
+          <ErrorBoundary>
+            <UserWidget userId={userId} picturePath={user.picturePath} />
+          </ErrorBoundary>
         </Box>
         <Box
           maxWidth={isNonMobileScreens ? "45%" : undefined}
           flexBasis={isNonMobileScreens ? "45%" : undefined}
           mt={isNonMobileScreens ? undefined : "20px"}
         >
-          <PostsWidget userId={userId} isProfile />
+          <ErrorBoundary>
+            <PostsWidget userId={userId} isProfile />
+          </ErrorBoundary>
         </Box>
         {isNonMobileScreens && (
           <Box flexBasis="26%">
-            <FriendListWidget userId={userId} />
+            <ErrorBoundary>
+              <FriendListWidget userId={userId} />
+            </ErrorBoundary>
           </Box>
         )}
       </Box>

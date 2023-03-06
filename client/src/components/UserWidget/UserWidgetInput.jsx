@@ -76,9 +76,15 @@ const UserWidgetInput = ({ userId, displayedInfo, initText, typeOfData }) => {
         sx={{ width: "90%", height: "28px" }}
       >
         {typeOfData === "location" ? (
-          <LocationOnOutlined sx={{ color: palette.primary.main }} />
+          <LocationOnOutlined
+            fontSize="large"
+            sx={{ color: palette.primary.main }}
+          />
         ) : (
-          <WorkOutlineOutlined sx={{ color: palette.primary.main }} />
+          <WorkOutlineOutlined
+            fontSize="large"
+            sx={{ color: palette.primary.main }}
+          />
         )}
 
         {isMyUserWidget && isDataEdited ? (

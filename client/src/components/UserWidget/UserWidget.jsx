@@ -261,17 +261,14 @@ const UserWidget = ({ userId, picturePath }) => {
         <UserSocialLinks links={user.socialLinks} userId={userId} />
       </WidgetWrapper>
 
-      {isPhotoModalOpen && (
-        <PhotoModal
-          image={
-            changedAvatarUrl !== null
-              ? changedAvatarUrl
-              : currentUser.picturePath
-          }
-          alt={currentUser.firstName}
-          closeModal={closePhotoModal}
-        />
-      )}
+      <PhotoModal
+        image={
+          changedAvatarUrl !== null ? changedAvatarUrl : currentUser.picturePath
+        }
+        alt={currentUser.firstName}
+        opened={isPhotoModalOpen}
+        closeModal={closePhotoModal}
+      />
     </Box>
   );
 };

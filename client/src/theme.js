@@ -24,6 +24,9 @@ export const themeSettings = (mode) => {
             buttons: {
               main: "#38006b",
               hover: "#540254",
+              loginBtn: "#4a148c",
+              loginBtnHover: "#2e0c57",
+              text: "#cbebe0",
             },
             skeleton: {
               background: "#221646",
@@ -34,6 +37,9 @@ export const themeSettings = (mode) => {
             },
             logos: {
               primary: "#595364",
+            },
+            modal: {
+              bg: "#1f123f",
             },
           }
         : {
@@ -56,6 +62,9 @@ export const themeSettings = (mode) => {
             buttons: {
               main: "#12005e",
               hover: "#c8bbd9",
+              loginBtn: "#7c43bd",
+              loginBtnHover: "#4a148c",
+              text: "#fff",
             },
             skeleton: {
               background: "#debeec",
@@ -66,6 +75,9 @@ export const themeSettings = (mode) => {
             },
             logos: {
               primary: "#6a627a",
+            },
+            modal: {
+              bg: "#e8eaf6",
             },
           }),
     },

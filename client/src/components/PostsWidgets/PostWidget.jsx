@@ -166,7 +166,11 @@ const PostWidget = ({
             }}
           />
         ) : (
-          <Typography fontWeight="500" mt="10px" sx={{ wordWrap: "break-word" }}>
+          <Typography
+            fontWeight="500"
+            mt="10px"
+            sx={{ wordWrap: "break-word" }}
+          >
             {description}
           </Typography>
         )}
@@ -185,7 +189,7 @@ const PostWidget = ({
             onClick={openPhotoModal}
           />
         )}
-  
+
         <FlexBetweenBox m="7px 0 5px">
           <FlexBetweenBox gap="10px">
             <FlexBetweenBox gap="5px">
@@ -274,9 +278,12 @@ const PostWidget = ({
           </Box>
         )}
       </WidgetWrapper>
-      {isPhotoModalOpen && (
-        <PhotoModal image={picturePath} closeModal={closePhotoModal} />
-      )}
+
+      <PhotoModal
+        image={picturePath}
+        opened={isPhotoModalOpen}
+        closeModal={closePhotoModal}
+      />
     </>
   );
 };

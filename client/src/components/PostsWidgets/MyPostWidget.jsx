@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ref, uploadBytes, getDownloadURL } from "@firebase/storage";
 import { storage } from "../../firebase";
 import { useNavigate } from "react-router-dom";
@@ -37,7 +37,8 @@ const MyPostWidget = ({ picturePath }) => {
   const _id = useSelector((state) => state.auth.user._id);
   const token = useSelector((state) => state.auth.token);
   const initPosts = useSelector((state) => state.postsWidget.posts);
-  const isNonMobileScreens = useMediaQuery("(min-width: 500px)");
+  const isNonMobileScreens = useMediaQuery("(min-width: 1000px)");
+  const isNonSmallScreens = useMediaQuery("(min-width: 500px)");
   const navigate = useNavigate();
 
   const onNavigate = () => {
@@ -96,7 +97,7 @@ const MyPostWidget = ({ picturePath }) => {
   };
 
   return (
-    <WidgetWrapper sx={{ marginBottom: "20px" }}>
+    <WidgetWrapper>
       <FlexBetweenBox gap="15px">
         <UserImage image={picturePath} navigate={onNavigate} />
         <InputBase
@@ -157,7 +158,7 @@ const MyPostWidget = ({ picturePath }) => {
           />
         </Button>
 
-        {isNonMobileScreens ? (
+        {isNonSmallScreens ? (
           <AddFileBtns />
         ) : (
           <>

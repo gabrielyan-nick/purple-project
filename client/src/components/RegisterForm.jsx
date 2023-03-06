@@ -332,47 +332,47 @@ const RegisterForm = () => {
                 type="submit"
                 sx={{
                   mt: "30px",
-                  backgroundColor: palette.primary.light,
-                  color: palette.background.default,
+                  backgroundColor: palette.buttons.loginBtn,
+                  color: palette.buttons.text,
                   "&:hover": {
-                    backgroundColor: palette.primary.main,
+                    backgroundColor: palette.buttons.loginBtnHover,
                   },
                 }}
               >
                 {isRegister ? "Register" : "Login"}
               </Button>
-              <Typography
+              <Button
+                fullWidth
+                sx={{
+                  mt: "10px",
+                  backgroundColor: palette.buttons.loginBtn,
+                  color: palette.buttons.text,
+                  "&:hover": {
+                    backgroundColor: palette.buttons.loginBtnHover,
+                  },
+                }}
                 onClick={() => {
                   setPageType(isLogin ? "register" : "login");
                   resetForm();
                   setRegisterError(false);
                 }}
-                sx={{
-                  mt: "5px",
-                  color: palette.primary.main,
-                  textDecoration: "underline",
-                  "&:hover": {
-                    color: palette.primary.light,
-                    cursor: "pointer",
-                  },
-                }}
               >
                 {isLogin
                   ? "Don't have an account? Sign up here."
-                  : "Already have an account? Login here."}
-              </Typography>
+                  : "Already have an account? Login here"}
+              </Button>
             </Box>
           </Form>
         )}
       </Formik>
-      {isPhotoModalOpen && (
-        <PhotoModal
-          image={avatarUrl}
-          alt={"avatar"}
-          closeModal={closePhotoModal}
-          isInRegForm
-        />
-      )}
+
+      <PhotoModal
+        image={avatarUrl}
+        alt={"avatar"}
+        opened={isPhotoModalOpen}
+        closeModal={closePhotoModal}
+        isInRegForm
+      />
     </>
   );
 };

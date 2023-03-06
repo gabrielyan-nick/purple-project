@@ -8,12 +8,17 @@ import {
 } from "@mui/material";
 import { DarkMode, LightMode } from "@mui/icons-material";
 import { useSelector, useDispatch } from "react-redux";
-import { LightLogo, DarkLogo, RegisterForm } from "../../components";
+import {
+  LightLogo,
+  DarkLogo,
+  RegisterForm,
+  ErrorBoundary,
+} from "../../components";
 import { setMode } from "../../store/index";
 
 const LoginPage = () => {
   const dispatch = useDispatch();
-  const {palette} = useTheme();
+  const { palette } = useTheme();
   const isNonMobileScreens = useMediaQuery("(min-width: 1000px)");
   const isSmallScreens = useMediaQuery("(max-width: 600px)");
   const mode = useSelector((state) => state.auth.mode);
@@ -35,7 +40,7 @@ const LoginPage = () => {
         }}
       >
         {mode === "light" ? <LightLogo /> : <DarkLogo />}
-        <IconButton onClick={onSetMode} sx={{height: '40px'}}>
+        <IconButton onClick={onSetMode} sx={{ height: "40px" }}>
           {mode === "dark" ? (
             <DarkMode sx={{ fontSize: "25px" }} />
           ) : (
@@ -51,12 +56,19 @@ const LoginPage = () => {
         borderRadius="15px"
         backgroundColor={palette.background.alt}
       >
-        <Typography color={palette.primary.main} fontWeight="500" variant="h4" sx={{ mb: 2 }}>
+        <Typography
+          color={palette.primary.main}
+          fontWeight="500"
+          variant="h4"
+          sx={{ mb: 2 }}
+        >
           {`Welcome to Purple${
             !isSmallScreens ? ", social network for everyone" : ""
           }`}
         </Typography>
-        <RegisterForm />
+        <ErrorBoundary>
+          <RegisterForm />
+        </ErrorBoundary>
       </Box>
     </Box>
   );

@@ -17,8 +17,8 @@ const FriendListWidget = ({ userId }) => {
   const isMyList = _id === userId;
   const currentFriends = isMyList ? friends : friendList;
   const displayedFriends = showAll
-  ? currentFriends
-  : currentFriends.slice(0, 5);
+    ? currentFriends
+    : currentFriends.slice(0, 5);
 
   useEffect(() => {
     isMyList

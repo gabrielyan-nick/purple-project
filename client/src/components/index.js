@@ -17,3 +17,6 @@ export { default as UserWidgetInput } from "./UserWidget/UserWidgetInput";
 export { default as UserSocialLinks } from "./UserWidget/UserSocialLinks";
 export { default as SocialLink } from "./UserWidget/SocialLink";
 export { default as SocialLogos } from "./SocialLogos";
+export { default as ErrorMessage } from "./ErrorMessage/ErrorMessage";
+export { default as ErrorBoundary } from "./ErrorBoundary";
+export { default as ModalWindow } from "./ModalWindow/ModalWindow";
