@@ -41,7 +41,10 @@ const UserSchema = new mongoose.Schema(
     },
     location: String,
     occupation: String,
+    resetPasswordToken: String,
+    resetPasswordExpires: Date,
   },
+
   { timestamps: true }
 );
 
