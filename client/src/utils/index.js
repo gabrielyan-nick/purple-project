@@ -52,11 +52,16 @@ export function getDomain(url) {
 }
 
 export function fixEditedUrl(urlString) {
-  const urls = urlString.split('https://');
+  const urls = urlString.split("https://");
   if (urls.length === 3) {
     return `https://${urls[2]}`;
   } else {
-    return urlString; 
+    return urlString;
   }
 }
 
+export function isUrlTest(str) {
+  if (/^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$/i.test(str)) {
+    return true;
+  } else return false;
+}

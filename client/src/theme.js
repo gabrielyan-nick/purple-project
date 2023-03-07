@@ -25,7 +25,7 @@ export const themeSettings = (mode) => {
               main: "#38006b",
               hover: "#540254",
               loginBtn: "#4a148c",
-              loginBtnHover: "#2e0c57",
+              loginBtnHover: "#381661",
               text: "#cbebe0",
             },
             skeleton: {

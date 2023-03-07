@@ -1,4 +1,5 @@
 import { React, useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { ref, uploadBytes, getDownloadURL } from "@firebase/storage";
 import { storage } from "../firebase";
 import {
@@ -19,7 +20,7 @@ import * as yup from "yup";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setLogin } from "./../store";
-import { FlexBetweenBox, PhotoModal } from "./index";
+import { FlexBetweenBox, PhotoModal, ForgotPassword } from "./index";
 
 const registerSchema = yup.object({
   firstName: yup.string().required("Required"),
@@ -46,7 +47,7 @@ const initialValuesRegister = {
   picture: "",
 };
 
-const RegisterForm = () => {
+const RegisterForm = ({ setForgotPass }) => {
   const [pageType, setPageType] = useState("login");
   const [showPassword, setShowPassword] = useState(false);
   const [userExist, setUserExist] = useState(false);
@@ -309,11 +310,31 @@ const RegisterForm = () => {
                       toggleShowPassword={onToggleShowPassword}
                       loginError={loginError}
                     />
+                    <Box display="flex" justifyContent="flex-end">
+                      <Typography
+                        onClick={() => setForgotPass(true)}
+                        sx={{
+                          textDecoration: "underline",
+                          marginLeft: "auto",
+                          cursor: "pointer",
+                          "&:hover": {
+                            color: palette.primary.main,
+                          },
+                        }}
+                      >
+                        Forgot password
+                      </Typography>
+                    </Box>
                   </div>
                 </>
               )}
             </Box>
-            <Box sx={{ position: "relative" }}>
+            <Box
+              sx={{ position: "relative" }}
+              display="flex"
+              flexDirection="column"
+              alignItems="center"
+            >
               {registerError && (
                 <Typography
                   color="#d32f2f"
@@ -331,7 +352,7 @@ const RegisterForm = () => {
                 fullWidth
                 type="submit"
                 sx={{
-                  mt: "30px",
+                  mt: "20px",
                   backgroundColor: palette.buttons.loginBtn,
                   color: palette.buttons.text,
                   "&:hover": {
@@ -342,8 +363,8 @@ const RegisterForm = () => {
                 {isRegister ? "Register" : "Login"}
               </Button>
               <Button
-                fullWidth
                 sx={{
+                  width: `${!isNonMobile ? "100%" : "62%"}`,
                   mt: "10px",
                   backgroundColor: palette.buttons.loginBtn,
                   color: palette.buttons.text,
@@ -358,7 +379,7 @@ const RegisterForm = () => {
                 }}
               >
                 {isLogin
-                  ? "Don't have an account? Sign up here."
+                  ? "Don't have an account? Sign up here"
                   : "Already have an account? Login here"}
               </Button>
             </Box>
@@ -417,7 +438,7 @@ const PasswordInput = ({ showPassword, toggleShowPassword, loginError }) => {
       />
       <IconButton
         onClick={toggleShowPassword}
-        sx={{ position: "absolute", right: "5px", top: "20%" }}
+        sx={{ position: "absolute", right: "5px", top: "17%" }}
         size="small"
       >
         {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}

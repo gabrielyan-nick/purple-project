@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   Typography,
   Box,
@@ -11,30 +12,26 @@ import { useSelector, useDispatch } from "react-redux";
 import {
   LightLogo,
   DarkLogo,
-  RegisterForm,
   ErrorBoundary,
-  ForgotPassword,
+  ResetPassword,
 } from "../../components";
 import { setMode } from "../../store/index";
 
-const LoginPage = () => {
-  const [isForgotPass, setIsForgotPass] = useState(false);
+const ResetPasswordPage = () => {
   const dispatch = useDispatch();
   const { palette } = useTheme();
   const isNonMobileScreens = useMediaQuery("(min-width: 1000px)");
   const isSmallScreens = useMediaQuery("(max-width: 600px)");
   const mode = useSelector((state) => state.auth.mode);
-
-  const onBackToLogin = () => {
-    setIsForgotPass(false);
-  };
+  const navigate = useNavigate();
+  const { token } = useParams();
 
   const onSetMode = () => {
     dispatch(setMode());
   };
 
-  const setForgotPass = (bool) => {
-    setIsForgotPass(bool);
+  const navOnLoginPage = () => {
+    navigate("/");
   };
 
   return (
@@ -50,9 +47,9 @@ const LoginPage = () => {
         }}
       >
         {mode === "light" ? (
-          <LightLogo navigate={onBackToLogin} />
+          <LightLogo navigate={navOnLoginPage} pointer="pointer" />
         ) : (
-          <DarkLogo navigate={onBackToLogin} />
+          <DarkLogo navigate={navOnLoginPage} pointer="pointer" />
         )}
         <IconButton onClick={onSetMode} sx={{ height: "40px" }}>
           {mode === "dark" ? (
@@ -65,33 +62,14 @@ const LoginPage = () => {
       <Box
         width={isNonMobileScreens ? "50%" : isSmallScreens ? "95%" : "85%"}
         maxWidth="500px"
-        p={2}
         mx="auto"
         borderRadius="15px"
         backgroundColor={palette.background.alt}
       >
-        <ErrorBoundary>
-          {isForgotPass ? (
-            <ForgotPassword />
-          ) : (
-            <>
-              <Typography
-                color={palette.primary.main}
-                fontWeight="500"
-                variant="h4"
-                sx={{ mb: 2 }}
-              >
-                {`Welcome to Purple${
-                  !isSmallScreens ? ", social network for everyone" : ""
-                }`}
-              </Typography>
-              <RegisterForm setForgotPass={setForgotPass} />
-            </>
-          )}
-        </ErrorBoundary>
+        <ResetPassword resetToken={token} />
       </Box>
     </Box>
   );
 };
 
-export default LoginPage;
+export default ResetPasswordPage;

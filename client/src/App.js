@@ -7,6 +7,7 @@ import { themeSettings } from "theme";
 import HomePage from "pages/homePage";
 import LoginPage from "pages/loginPage";
 import ProfilePage from "pages/profilePage";
+import ResetPasswordPage from "pages/resetPasswordPage";
 
 const App = () => {
   const mode = useSelector((state) => state.auth.mode);
@@ -31,6 +32,7 @@ const App = () => {
               path="/profile/:userId"
               element={isAuth ? <ProfilePage /> : <Navigate to={"/"} />}
             />
+            <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
           </Routes>
         </ThemeProvider>
       </BrowserRouter>

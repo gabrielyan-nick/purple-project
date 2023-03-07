@@ -17,7 +17,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { updateUserData } from "../../store";
 import { setListFix } from "components/FriendListWidget/friendListWidgetSlice";
 import { setUserFix } from "./userWidgetSlice";
-import { fixUrl, getSocialNetwork, fixEditedUrl } from "utils";
+import { fixUrl, getSocialNetwork, fixEditedUrl, isUrlTest } from "utils";
 
 const SocialLink = ({ links, link, userId }) => {
   const loggedInUser = useSelector((state) => state.auth.user);
@@ -52,6 +52,7 @@ const SocialLink = ({ links, link, userId }) => {
 
   const onCancelEditLink = () => {
     setIsLinkEdited(false);
+    setEditedLink(link.link);
   };
 
   const onDeleteLink = () => {
@@ -84,11 +85,7 @@ const SocialLink = ({ links, link, userId }) => {
   };
 
   const onSaveEditedLink = () => {
-    if (editedLink === link.link) {
-      setLoadingStatus("idle");
-      setIsLinkEdited(false);
-      setEditedLink(fixEditedUrl(editedLink));
-    } else {
+    if (!editedLink === link.link && isUrlTest(editedLink)) {
       const index = links.findIndex((item) => item.link === link.link);
       const formData = new FormData();
       for (let i = 0; i < index; i++) {
@@ -106,7 +103,6 @@ const SocialLink = ({ links, link, userId }) => {
         formData.append(`socialLinks[${i}][name]`, links[i].name);
         formData.append(`socialLinks[${i}][link]`, links[i].link);
       }
-
       setLoadingStatus("loading");
       dispatch(
         updateUserData({
@@ -124,6 +120,10 @@ const SocialLink = ({ links, link, userId }) => {
           dispatch(setListFix());
         })
         .catch(() => setLoadingStatus("error"));
+    } else if (editedLink === link.link) {
+      setLoadingStatus("idle");
+      setIsLinkEdited(false);
+      setEditedLink(fixEditedUrl(editedLink));
     }
   };
 

@@ -14,9 +14,11 @@ export { default as FriendListWidget } from "./FriendListWidget/FriendListWidget
 export { PostCommentMemo } from "./PostsWidgets/PostComment";
 export { default as PhotoModal } from "./PhotoModal/PhotoModal";
 export { default as UserWidgetInput } from "./UserWidget/UserWidgetInput";
-export { default as UserSocialLinks } from "./UserWidget/UserSocialLinks";
+export { default as UserSocialLinks } from "./UserWidget/UserSocialLinks/UserSocialLinks";
 export { default as SocialLink } from "./UserWidget/SocialLink";
 export { default as SocialLogos } from "./SocialLogos";
 export { default as ErrorMessage } from "./ErrorMessage/ErrorMessage";
 export { default as ErrorBoundary } from "./ErrorBoundary";
 export { default as ModalWindow } from "./ModalWindow/ModalWindow";
+export { default as ForgotPassword } from "./ForgotPassword";
+export { default as ResetPassword } from "./ResetPassword";
