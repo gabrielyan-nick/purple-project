@@ -1,13 +1,14 @@
-import { React, useMemo, useState, useEffect } from "react";
+import { React, useMemo, Suspense, lazy } from "react";
 import { BrowserRouter, Navigate, Routes, Route } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { createTheme } from "@mui/material/styles";
 import { themeSettings } from "theme";
-import HomePage from "pages/homePage";
-import LoginPage from "pages/loginPage";
-import ProfilePage from "pages/profilePage";
-import ResetPasswordPage from "pages/resetPasswordPage";
+
+const HomePage = lazy(() => import("./pages/homePage"));
+const LoginPage = lazy(() => import("./pages/loginPage"));
+const ProfilePage = lazy(() => import("./pages/profilePage"));
+const ResetPasswordPage = lazy(() => import("./pages/resetPasswordPage"));
 
 const App = () => {
   const mode = useSelector((state) => state.auth.mode);
@@ -19,21 +20,26 @@ const App = () => {
       <BrowserRouter>
         <ThemeProvider theme={theme}>
           <CssBaseline />
-          <Routes>
-            <Route
-              path="/"
-              element={!isAuth ? <LoginPage /> : <Navigate to={"/home"} />}
-            />
-            <Route
-              path="/home"
-              element={isAuth ? <HomePage /> : <Navigate to={"/"} />}
-            />
-            <Route
-              path="/profile/:userId"
-              element={isAuth ? <ProfilePage /> : <Navigate to={"/"} />}
-            />
-            <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
-          </Routes>
+          <Suspense>
+            <Routes>
+              <Route
+                path="/"
+                element={!isAuth ? <LoginPage /> : <Navigate to={"/home"} />}
+              />
+              <Route
+                path="/home"
+                element={isAuth ? <HomePage /> : <Navigate to={"/"} />}
+              />
+              <Route
+                path="/profile/:userId"
+                element={isAuth ? <ProfilePage /> : <Navigate to={"/"} />}
+              />
+              <Route
+                path="/reset-password/:token"
+                element={<ResetPasswordPage />}
+              />
+            </Routes>
+          </Suspense>
         </ThemeProvider>
       </BrowserRouter>
     </div>
