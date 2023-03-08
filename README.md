@@ -1,3 +1,3 @@
 # Purple project
 
-Socia network pet project based on MERN 
+Social network pet project based on MERN 
