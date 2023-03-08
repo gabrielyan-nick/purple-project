@@ -13,7 +13,7 @@ export const fetchPosts = createAsyncThunk(
     const response = await fetch(
       `http://localhost:3001/posts${
         isUsersPosts ? `/${userId}/posts` : ""
-      }?offset=0&limit=5`,
+      }?offset=0&limit=6`,
       {
         method: "GET",
         headers: { Authorization: `Bearer ${token}` },
@@ -205,6 +205,8 @@ const postsWidgetSlice = createSlice({
           .filter(
             (item, i, self) => i === self.findIndex((j) => j._id === item._id)
           )
+          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        state.isEndOfList = false;
       })
       .addCase(deletePost.fulfilled, (state, action) => {
         state.posts = state.posts
@@ -214,6 +216,7 @@ const postsWidgetSlice = createSlice({
               i === self.findIndex((j) => j._id === item._id) &&
               item._id !== action.payload.postId
           );
+        state.isEndOfList = false;
       })
       .addCase(updatePost.fulfilled, (state, action) => {
         state.posts = action.payload;

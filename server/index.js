@@ -40,8 +40,5 @@ mongoose
   })
   .then(() => {
     app.listen(PORT, () => console.log(`Server run on port ${PORT}`));
-    // ADD FAKE DATA ONE TIME
-    // Post.insertMany(posts);
-    // User.insertMany(users);
   })
   .catch((error) => console.log(error));

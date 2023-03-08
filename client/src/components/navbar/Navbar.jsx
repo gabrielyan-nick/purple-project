@@ -74,38 +74,6 @@ const Navbar = () => {
         ) : (
           <DarkLogo navigate={() => navigate("/home")} pointer="pointer" />
         )}
-
-        {isNonMobileScreens && (
-          <FlexBetweenBox
-            sx={{
-              borderRadius: "15px",
-              boxShadow: `0px 0px 6px ${primaryColor}`,
-              overflow: "hidden",
-            }}
-          >
-            <InputBase
-              placeholder="Search..."
-              sx={{
-                padding: "0 10px",
-              }}
-            />
-            <IconButton
-              sx={{
-                backgroundColor: background,
-                padding: 0,
-                width: "30px",
-                height: "29px",
-                borderRadius: 0,
-                "&:hover": {
-                  backgroundColor: altBackground,
-                },
-                transition: "all .3s",
-              }}
-            >
-              <Search />
-            </IconButton>
-          </FlexBetweenBox>
-        )}
       </FlexBetweenBox>
 
       {/* DESKTOP NAV */}

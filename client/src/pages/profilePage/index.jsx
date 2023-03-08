@@ -5,7 +5,6 @@ import { Box, useMediaQuery } from "@mui/material";
 import {
   Navbar,
   UserWidget,
-  MyPostWidget,
   PostsWidget,
   FriendListWidget,
   ErrorBoundary,
@@ -19,6 +18,11 @@ const ProfilePage = () => {
   const isMyProfile = userId === loggedInUser._id;
   const isNonMobileScreens = useMediaQuery("(min-width: 1000px)");
   const isSmallScreens = useMediaQuery("(max-width: 600px)");
+  const [offset, setOffset] = useState(0);
+
+  const changeOffset = (num) => {
+    setOffset(num);
+  };
 
   const getUserInfo = async () => {
     const response = await fetch(`http://localhost:3001/users/${userId}`, {
@@ -58,7 +62,12 @@ const ProfilePage = () => {
           mt={isNonMobileScreens ? undefined : "20px"}
         >
           <ErrorBoundary>
-            <PostsWidget userId={userId} isProfile />
+            <PostsWidget
+              userId={userId}
+              isProfile
+              offset={offset}
+              setOffset={changeOffset}
+            />
           </ErrorBoundary>
         </Box>
         {isNonMobileScreens && (

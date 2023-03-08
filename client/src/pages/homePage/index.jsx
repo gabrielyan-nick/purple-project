@@ -14,6 +14,11 @@ const HomePage = () => {
   const isNonMobileScreens = useMediaQuery("(min-width: 1000px)");
   const isSmallScreens = useMediaQuery("(max-width: 600px)");
   const { _id, picturePath } = useSelector((state) => state.auth.user);
+  const [offset, setOffset] = useState(0);
+
+  const changeOffset = (num) => {
+    setOffset(num);
+  };
 
   return (
     <Box>
@@ -40,10 +45,17 @@ const HomePage = () => {
           sx={{ order: `${!isNonMobileScreens ? "1" : "0"}` }}
         >
           <ErrorBoundary>
-            <MyPostWidget picturePath={picturePath} />
+            <MyPostWidget
+              picturePath={picturePath}
+              changeOffset={changeOffset}
+            />
           </ErrorBoundary>
           <ErrorBoundary>
-            <PostsWidget userId={_id} />
+            <PostsWidget
+              userId={_id}
+              offset={offset}
+              setOffset={changeOffset}
+            />
           </ErrorBoundary>
         </Box>
 

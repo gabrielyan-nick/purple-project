@@ -1,14 +1,15 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, createRef, useMemo } from "react";
+import { TransitionGroup, CSSTransition } from "react-transition-group";
 import { useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchPosts, lazzyLoadPosts } from "./postsWidgetsSlice";
-import { PostWidgetMemo, WidgetWrapper } from "../index";
+import { PostWidget, WidgetWrapper } from "../index";
 import { Box } from "@mui/system";
 import useOnIntersection from "hooks/useOnIntersection";
 import { CircularProgress, Typography } from "@mui/material";
+import "./styles.scss";
 
-const PostsWidget = ({ userId, isProfile = false }) => {
-  const [offset, setOffset] = useState(0);
+const PostsWidget = ({ userId, offset, setOffset, isProfile = false }) => {
   const [limit, setLimit] = useState(5);
   const postsReloadFix = useSelector(
     (state) => state.postsWidget.postsReloadFix
@@ -35,47 +36,70 @@ const PostsWidget = ({ userId, isProfile = false }) => {
 
   function lazzyLoadingPosts() {
     if (!isEndOfList && postsLoadingStatus !== "loading") {
-      setOffset((offset) => offset + limit);
-      isProfile
-        ? dispatch(
-            lazzyLoadPosts({ token, userId, offset, isUsersPosts: true })
-          )
-        : dispatch(lazzyLoadPosts({ token, userId, offset }));
+      if (!isEndOfList) {
+        setOffset((offset) => offset + limit);
+        isProfile
+          ? dispatch(
+              lazzyLoadPosts({ token, userId, offset, isUsersPosts: true })
+            )
+          : dispatch(lazzyLoadPosts({ token, userId, offset }));
+      }
     }
   }
+
+  const postRef = useMemo(
+    () =>
+      posts.reduce((acc, { _id }) => {
+        acc[_id] = createRef();
+        return acc;
+      }, {}),
+    [posts]
+  ); // создаем обьект уникальных рефов для коректной работы анимации
 
   return (
     <Box display="flex" flexDirection="column" gap="20px" alignItems="center">
       {posts.length !== 0 ? (
-        posts.map(
-          ({
-            _id,
-            userId,
-            firstName,
-            lastName,
-            description,
-            location,
-            picturePath,
-            userPicturePath,
-            likes,
-            comments,
-            createdAt,
-          }) => (
-            <PostWidgetMemo
-              key={_id}
-              postId={_id}
-              postUserId={userId}
-              name={`${firstName} ${lastName}`}
-              description={description}
-              location={location}
-              picturePath={picturePath}
-              userPicturePath={userPicturePath}
-              likes={likes}
-              comments={comments}
-              createdAt={createdAt}
-            />
-          )
-        )
+        <TransitionGroup component={null}>
+          {posts.map(
+            ({
+              _id,
+              userId,
+              firstName,
+              lastName,
+              description,
+              location,
+              picturePath,
+              userPicturePath,
+              likes,
+              comments,
+              createdAt,
+            }) => (
+              <CSSTransition
+                timeout={200}
+                key={_id}
+                classNames="post"
+                nodeRef={postRef[_id]}
+                mountOnEnter
+                unmountOnExit
+              >
+                <PostWidget
+                  key={`${_id}-${createdAt}`}
+                  postId={_id}
+                  postUserId={userId}
+                  name={`${firstName} ${lastName}`}
+                  description={description}
+                  location={location}
+                  picturePath={picturePath}
+                  userPicturePath={userPicturePath}
+                  likes={likes}
+                  comments={comments}
+                  createdAt={createdAt}
+                  ref={postRef[_id]}
+                />
+              </CSSTransition>
+            )
+          )}
+        </TransitionGroup>
       ) : (
         <WidgetWrapper>
           <Box

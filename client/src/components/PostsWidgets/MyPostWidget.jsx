@@ -15,8 +15,9 @@ import {
   useMediaQuery,
   Popover,
   Fade,
+  CircularProgress,
 } from "@mui/material";
-import { FlexBetweenBox, WidgetWrapper, UserImage } from "components";
+import { FlexBetweenBox, WidgetWrapper, UserImage, Modal } from "components";
 import {
   AttachFileOutlined,
   DeleteOutlined,
@@ -27,7 +28,7 @@ import {
 } from "@mui/icons-material";
 import { setPostsReloadFix } from "./postsWidgetsSlice";
 
-const MyPostWidget = ({ picturePath }) => {
+const MyPostWidget = ({ picturePath, changeOffset }) => {
   const dispatch = useDispatch();
   const [image, setImage] = useState(null);
   const [imageUrl, setImageUrl] = useState("");
@@ -37,12 +38,24 @@ const MyPostWidget = ({ picturePath }) => {
   const _id = useSelector((state) => state.auth.user._id);
   const token = useSelector((state) => state.auth.token);
   const initPosts = useSelector((state) => state.postsWidget.posts);
-  const isNonMobileScreens = useMediaQuery("(min-width: 1000px)");
   const isNonSmallScreens = useMediaQuery("(min-width: 500px)");
+  const [postLoadingStatus, setPostLoadingStatus] = useState("idle");
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
 
   const onNavigate = () => {
     navigate(`/profile/${_id}`);
+  };
+
+  const onModalClose = () => {
+    setIsModalOpen(false);
+  };
+
+  const onModalOpen = () => {
+    if (anchorEl !== null) {
+      handleClosePopover();
+    }
+    setIsModalOpen(true);
   };
 
   const onAddImage = async (e) => {
@@ -64,10 +77,12 @@ const MyPostWidget = ({ picturePath }) => {
     if (url) {
       formData.append("picturePath", url);
     }
+    setPostLoadingStatus("loading");
     dispatch(addMyPost({ formData, token, initPosts })).then(() => {
+      changeOffset(0);
       setImage(null);
       setPost("");
-      dispatch(setPostsReloadFix());
+      setPostLoadingStatus("idle");
     });
   };
 
@@ -97,132 +112,167 @@ const MyPostWidget = ({ picturePath }) => {
   };
 
   return (
-    <WidgetWrapper>
-      <FlexBetweenBox gap="15px">
-        <UserImage image={picturePath} navigate={onNavigate} />
-        <InputBase
-          placeholder="What's on your mind?"
-          onChange={(e) => setPost(e.target.value)}
-          value={post}
-          multiline
-          sx={{
-            width: "100%",
-            backgroundColor: "transparent",
-            borderRadius: "15px",
-            padding: "10px",
-            boxShadow: `0px 0px 6px ${palette.primary.main}`,
-          }}
-        />
-      </FlexBetweenBox>
-
-      {image && (
-        <Fade in={!!image} timeout={300}>
-          <Box
+    <>
+      <WidgetWrapper>
+        <FlexBetweenBox gap="15px">
+          <UserImage image={picturePath} navigate={onNavigate} />
+          <InputBase
+            placeholder="What's on your mind?"
+            onChange={(e) => setPost(e.target.value)}
+            value={post}
+            multiline
             sx={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              gap: "5px",
+              width: "100%",
+              backgroundColor: "transparent",
+              borderRadius: "15px",
+              padding: "10px",
+              boxShadow: `0px 0px 6px ${palette.primary.main}`,
             }}
-          >
-            <img
-              src={imageUrl}
-              alt={image.name.slice(0, 20)}
-              style={{ maxWidth: "200px" }}
-            />
-
-            <IconButton onClick={() => setImage(null)}>
-              <DeleteOutlined sx={{ color: palette.primary.main }} />
-            </IconButton>
-          </Box>
-        </Fade>
-      )}
-
-      <Divider sx={{ margin: "10px 0" }} />
-
-      <FlexBetweenBox>
-        <Button
-          variant="text"
-          component="label"
-          sx={{ textTransform: "capitalize" }}
-        >
-          <FlexBetweenBox gap="5px" sx={{ cursor: "pointer" }}>
-            <ImageOutlined sx={{ color: palette.primary.main }} />
-            <Typography>Image</Typography>
-          </FlexBetweenBox>
-          <input
-            type="file"
-            hidden
-            accept="image/png, image/jpg, image/jpeg"
-            onChange={onAddImage}
           />
-        </Button>
+        </FlexBetweenBox>
 
-        {isNonSmallScreens ? (
-          <AddFileBtns />
-        ) : (
-          <>
-            <Box>
-              <IconButton onClick={handleClickPopover}>
-                <MoreHorizOutlined sx={{ color: palette.primary.main }} />
+        {image && (
+          <Fade in={!!image} timeout={300}>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                gap: "5px",
+              }}
+            >
+              <img
+                src={imageUrl}
+                alt={image.name.slice(0, 20)}
+                style={{ maxWidth: "200px" }}
+              />
+
+              <IconButton onClick={() => setImage(null)}>
+                <DeleteOutlined sx={{ color: palette.primary.main }} />
               </IconButton>
-              <Popover
-                open={!!anchorEl}
-                onClose={handleClosePopover}
-                anchorEl={anchorEl}
-                anchorOrigin={{
-                  vertical: "bottom",
-                  horizontal: "center",
-                }}
-                transformOrigin={{
-                  vertical: "top",
-                  horizontal: "center",
-                }}
-              >
-                <AddFileBtns />
-              </Popover>
             </Box>
-          </>
+          </Fade>
         )}
 
-        <Button
-          variant="contained"
-          disabled={!image && !post}
-          onClick={handlePost}
-          sx={{
-            backgroundColor: palette.buttons.main,
-            borderRadius: "5px",
-            color: "#fff",
-          }}
-        >
-          Post
-        </Button>
-      </FlexBetweenBox>
-    </WidgetWrapper>
+        <Divider sx={{ margin: "10px 0" }} />
+
+        <FlexBetweenBox>
+          <Button
+            variant="text"
+            component="label"
+            sx={{ textTransform: "capitalize" }}
+          >
+            <FlexBetweenBox gap="5px" sx={{ cursor: "pointer" }}>
+              <ImageOutlined sx={{ color: palette.primary.main }} />
+              <Typography>Image</Typography>
+            </FlexBetweenBox>
+            <input
+              type="file"
+              hidden
+              accept="image/png, image/jpg, image/jpeg"
+              onChange={onAddImage}
+            />
+          </Button>
+
+          {isNonSmallScreens ? (
+            <AddFileBtns click={onModalOpen} />
+          ) : (
+            <>
+              <Box>
+                <IconButton onClick={handleClickPopover}>
+                  <MoreHorizOutlined sx={{ color: palette.primary.main }} />
+                </IconButton>
+                <Popover
+                  open={!!anchorEl}
+                  onClose={handleClosePopover}
+                  anchorEl={anchorEl}
+                  anchorOrigin={{
+                    vertical: "bottom",
+                    horizontal: "center",
+                  }}
+                  transformOrigin={{
+                    vertical: "top",
+                    horizontal: "center",
+                  }}
+                >
+                  <AddFileBtns click={onModalOpen} />
+                </Popover>
+              </Box>
+            </>
+          )}
+          {postLoadingStatus === "loading" ? (
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                width: "64px",
+                alignItems: "center",
+              }}
+            >
+              <CircularProgress size={20} />
+            </Box>
+          ) : (
+            <Button
+              variant="contained"
+              disabled={!image && !post}
+              onClick={handlePost}
+              sx={{
+                backgroundColor: palette.buttons.loginBtn,
+                '&:hover': {
+                  backgroundColor: palette.buttons.loginBtnHover,
+                },
+                borderRadius: "5px",
+                color: "#fff",
+              }}
+            >
+              Post
+            </Button>
+          )}
+        </FlexBetweenBox>
+      </WidgetWrapper>
+
+      <Modal opened={isModalOpen} closeModal={onModalClose}>
+        <Typography variant="h5">
+          This functionality is under develop
+        </Typography>
+      </Modal>
+    </>
   );
 };
 
 export default MyPostWidget;
 
-const AddFileBtns = () => {
+const AddFileBtns = ({ click }) => {
   const { palette } = useTheme();
   return (
     <>
-      <Button variant="text" sx={{ textTransform: "capitalize" }}>
+      <Button
+        onClick={click}
+        variant="text"
+        sx={{ textTransform: "capitalize" }}
+      >
         <FlexBetweenBox gap="5px" sx={{ cursor: "pointer" }}>
           <GifBoxOutlined sx={{ color: palette.primary.main }} />
           <Typography>Clip</Typography>
         </FlexBetweenBox>
       </Button>
 
-      <Button variant="text" sx={{ textTransform: "capitalize" }}>
+      <Button
+        onClick={click}
+        variant="text"
+        sx={{ textTransform: "capitalize" }}
+      >
         <FlexBetweenBox gap="5px" sx={{ cursor: "pointer" }}>
           <AttachFileOutlined sx={{ color: palette.primary.main }} />
           <Typography>Attachment</Typography>
         </FlexBetweenBox>
       </Button>
 
-      <Button variant="text" sx={{ textTransform: "capitalize" }}>
+      <Button
+        onClick={click}
+        variant="text"
+        sx={{ textTransform: "capitalize" }}
+      >
         <FlexBetweenBox gap="5px" sx={{ cursor: "pointer" }}>
           <MicOutlined sx={{ color: palette.primary.main }} />
           <Typography>Audio</Typography>

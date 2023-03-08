@@ -16,9 +16,9 @@ import {
 } from "@mui/material";
 import { FlexBetweenBox, SocialLink } from "components";
 import { useSelector, useDispatch } from "react-redux";
-import { updateUserData } from "../../../store";
+import { updateUserData } from "../../store";
 import { setListFix } from "components/FriendListWidget/friendListWidgetSlice";
-import { setUserFix } from "../userWidgetSlice";
+import { setUserFix } from "./userWidgetSlice";
 import { fixUrl, getSocialNetwork, isUrlTest } from "utils";
 import "./styles.scss";
 

@@ -1,0 +1,17 @@
+.friend-enter {
+  opacity: 0;
+}
+
+.friend-enter-done {
+  opacity: 1;
+  transition: opacity 300ms;
+}
+
+.friend-exit {
+  opacity: 1;
+}
+
+.friend-exit-active {
+  opacity: 0;
+  transition: opacity 300ms;
+}

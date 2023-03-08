@@ -1,9 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef, useMemo, createRef } from "react";
+import { TransitionGroup, CSSTransition } from "react-transition-group";
 import { Box, Button, Typography, useTheme } from "@mui/material";
 import { Friend, WidgetWrapper, FlexBetweenBox } from "../index";
 import { useDispatch, useSelector } from "react-redux";
 import { getMyFriendList } from "../../store";
 import { getFriendList } from "./friendListWidgetSlice";
+import "./styles.scss";
 
 const FriendListWidget = ({ userId }) => {
   const [showAll, setShowAll] = useState(false);
@@ -26,6 +28,16 @@ const FriendListWidget = ({ userId }) => {
       : dispatch(getFriendList({ userId, token }));
   }, [listFixState]);
 
+
+  const friendRef = useMemo(
+    () =>
+      currentFriends.reduce((acc, { _id }) => {
+        acc[_id] = createRef();
+        return acc;
+      }, {}),
+    [currentFriends]
+  ); // создаем обьект уникальных рефов для коректной работы анимации
+
   return (
     <WidgetWrapper>
       <FlexBetweenBox sx={{ mb: "15px" }}>
@@ -39,21 +51,34 @@ const FriendListWidget = ({ userId }) => {
       </FlexBetweenBox>
 
       <Box display="flex" flexDirection="column" gap="10px" alignItems="center">
-        {displayedFriends.map(
-          ({ _id, firstName, lastName, location, picturePath }) => {
-            if (_id !== undefined)
-              return (
-                <Friend
-                  key={`${_id}`}
-                  friendId={_id}
-                  name={`${firstName} ${lastName}`}
-                  subtitle={location}
-                  userPicturePath={picturePath}
-                  isInProfilePage={!isMyList ? true : false}
-                />
-              );
-          }
-        )}
+        <TransitionGroup component={null}>
+          {displayedFriends.map(
+            ({ _id, firstName, lastName, location, picturePath }) => {
+              if (_id !== undefined)
+                return (
+                  <CSSTransition
+                    timeout={200}
+                    key={`${_id}-${firstName}`}
+                    classNames="friend"
+                    nodeRef={friendRef[_id]}
+                    mountOnEnter
+                    unmountOnExit
+                  >
+                    <Friend
+                      key={_id}
+                      friendId={_id}
+                      name={`${firstName} ${lastName}`}
+                      subtitle={location}
+                      userPicturePath={picturePath}
+                      isInProfilePage={!isMyList ? true : false}
+                      ref={friendRef[_id]}
+                    />
+                  </CSSTransition>
+                );
+            }
+          )}
+        </TransitionGroup>
+
         {!currentFriends.length && !isMyList ? (
           <Typography py="15px">No friends. Be the first</Typography>
         ) : !currentFriends.length && isMyList ? (

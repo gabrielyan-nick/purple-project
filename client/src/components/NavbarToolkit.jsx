@@ -17,17 +17,36 @@ import {
   Notifications,
   Help,
 } from "@mui/icons-material";
-import { FlexBetweenBox, ModalWindow } from "./index";
+import { FlexBetweenBox, ConfirmModal, Modal } from "./index";
 
 const NavbarToolkit = ({ setMode, setLogout, fullName, direction = "row" }) => {
   const [isLogOutModalOpen, setIsLogOutModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isSelectOpen, setIsSelectOpen] = useState(false);
   const theme = useTheme();
   const background = theme.palette.background.default;
   const altBackground = theme.palette.background.alt;
   const primaryColor = theme.palette.primary.main;
 
-  const onModalClose = () => {
+  const onLogOutModalClose = () => {
     setIsLogOutModalOpen(false);
+  };
+
+  const onLogOutModalOpen = () => {
+    setIsLogOutModalOpen(true);
+    setIsSelectOpen(false);
+  };
+
+  const onModalClose = () => {
+    setIsModalOpen(false);
+  };
+
+  const onModalOpen = () => {
+    setIsModalOpen(true);
+  };
+
+  const toggleSelect = () => {
+    setIsSelectOpen(!isSelectOpen);
   };
 
   return (
@@ -45,16 +64,19 @@ const NavbarToolkit = ({ setMode, setLogout, fullName, direction = "row" }) => {
             )}
           </IconButton>
           <IconButton
+            onClick={onModalOpen}
             className={`${direction === "column" ? "mobMenu-ref" : ""}`}
           >
             <Message sx={{ color: primaryColor, fontSize: "25px" }} />
           </IconButton>
           <IconButton
+            onClick={onModalOpen}
             className={`${direction === "column" ? "mobMenu-ref" : ""}`}
           >
             <Notifications sx={{ color: primaryColor, fontSize: "25px" }} />
           </IconButton>
           <IconButton
+            onClick={onModalOpen}
             className={`${direction === "column" ? "mobMenu-ref" : ""}`}
           >
             <Help sx={{ color: primaryColor, fontSize: "25px" }} />
@@ -63,6 +85,9 @@ const NavbarToolkit = ({ setMode, setLogout, fullName, direction = "row" }) => {
 
         <FormControl variant="standard" value={fullName}>
           <Select
+            open={isSelectOpen}
+            onOpen={toggleSelect}
+            onClose={toggleSelect}
             className={`${direction === "column" ? "mobMenu-ref-select" : ""}`}
             value={fullName}
             sx={{
@@ -95,42 +120,24 @@ const NavbarToolkit = ({ setMode, setLogout, fullName, direction = "row" }) => {
             <MenuItem value={fullName}>
               <Typography>{fullName}</Typography>
             </MenuItem>
-            <MenuItem onClick={() => setIsLogOutModalOpen(true)}>
-              Log Out
-            </MenuItem>
+            <MenuItem onClick={onLogOutModalOpen}>Log Out</MenuItem>
           </Select>
         </FormControl>
       </FlexBetweenBox>
 
-      <ModalWindow opened={isLogOutModalOpen} closeModal={onModalClose}>
-        <Box>
-          <Typography variant="h5">Do you really want to log out?</Typography>
-          <FlexBetweenBox mt="15px">
-            <Button
-              style={{
-                backgroundColor: "#034934",
-                color: "#fff",
-                width: "30%",
-              }}
-              variant="contained"
-              onClick={setLogout}
-            >
-              Yes
-            </Button>
-            <Button
-              style={{
-                backgroundColor: "#49032e",
-                color: "#fff",
-                width: "30%",
-              }}
-              variant="contained"
-              onClick={onModalClose}
-            >
-              No
-            </Button>
-          </FlexBetweenBox>
-        </Box>
-      </ModalWindow>
+      <ConfirmModal
+        opened={isLogOutModalOpen}
+        closeModal={onLogOutModalClose}
+        action={setLogout}
+      >
+        Do you really want to log out?
+      </ConfirmModal>
+
+      <Modal opened={isModalOpen} closeModal={onModalClose}>
+        <Typography variant="h5">
+          This functionality is under develop
+        </Typography>
+      </Modal>
     </>
   );
 };

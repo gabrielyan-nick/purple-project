@@ -12,7 +12,7 @@ import {
   Button,
   Fade,
 } from "@mui/material";
-import { FlexBetweenBox, SocialLogos, ModalWindow } from "components";
+import { FlexBetweenBox, SocialLogos, ConfirmModal } from "components";
 import { useSelector, useDispatch } from "react-redux";
 import { updateUserData } from "../../store";
 import { setListFix } from "components/FriendListWidget/friendListWidgetSlice";
@@ -85,7 +85,7 @@ const SocialLink = ({ links, link, userId }) => {
   };
 
   const onSaveEditedLink = () => {
-    if (!editedLink === link.link && isUrlTest(editedLink)) {
+    if (!(editedLink === link.link) && isUrlTest(editedLink)) {
       const index = links.findIndex((item) => item.link === link.link);
       const formData = new FormData();
       for (let i = 0; i < index; i++) {
@@ -223,37 +223,13 @@ const SocialLink = ({ links, link, userId }) => {
         ) : null}
       </FlexBetweenBox>
 
-      <ModalWindow opened={isModalOpen} closeModal={onModalClose}>
-        <Box>
-          <Typography variant="h5">
-            Do you really want to remove this link?
-          </Typography>
-          <FlexBetweenBox mt="15px">
-            <Button
-              style={{
-                backgroundColor: "#034934",
-                color: "#fff",
-                width: "30%",
-              }}
-              variant="contained"
-              onClick={onDeleteLink}
-            >
-              Yes
-            </Button>
-            <Button
-              style={{
-                backgroundColor: "#49032e",
-                color: "#fff",
-                width: "30%",
-              }}
-              variant="contained"
-              onClick={onModalClose}
-            >
-              No
-            </Button>
-          </FlexBetweenBox>
-        </Box>
-      </ModalWindow>
+      <ConfirmModal
+        opened={isModalOpen}
+        closeModal={onModalClose}
+        action={onDeleteLink}
+      >
+        Do you really want to remove this link?
+      </ConfirmModal>
     </>
   );
 };

@@ -1,12 +1,13 @@
 import React, { useRef, useEffect, useState } from "react";
 import { CSSTransition } from "react-transition-group";
-import { IconButton, useTheme, Box } from "@mui/material";
+import { IconButton, useTheme, Box, Button } from "@mui/material";
 import { Close } from "@mui/icons-material";
+import { FlexBetweenBox } from "components";
 import useOnClickOutside from "hooks/useOnClickOutside";
 import useMount from "hooks/useMount";
 import "./styles.scss";
 
-const ModalWindow = ({ opened, closeModal, children }) => {
+const Modal = ({ opened, closeModal, children }) => {
   const [animationIn, setAnimationIn] = useState(false);
   const contentRef = useRef(null);
   const overlayRef = useRef(null);
@@ -101,7 +102,26 @@ const ModalWindow = ({ opened, closeModal, children }) => {
                   <Close sx={{ "&:hover": { color: palette.primary.main } }} />
                 </IconButton>
               </Box>
-              <Box px="10px">{children}</Box>
+              <Box px="10px">
+                {children}
+                <Box mt="15px" display="flex" justifyContent="center">
+                  <Button
+                    sx={{
+                      "&:hover": {
+                        backgroundColor: "#032e21",
+                      },
+                      backgroundColor: "#034934",
+
+                      color: "#fff",
+                      width: "30%",
+                    }}
+                    variant="contained"
+                    onClick={onCloseModal}
+                  >
+                    Ok
+                  </Button>
+                </Box>
+              </Box>
             </Box>
           </div>
         </CSSTransition>
@@ -110,4 +130,4 @@ const ModalWindow = ({ opened, closeModal, children }) => {
   );
 };
 
-export default ModalWindow;
+export default Modal;
