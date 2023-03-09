@@ -1,13 +1,26 @@
 import React, { useRef, useEffect, useState } from "react";
 import { CSSTransition } from "react-transition-group";
-import { IconButton, useTheme, Box, Button, Typography } from "@mui/material";
+import {
+  IconButton,
+  useTheme,
+  Box,
+  Button,
+  Typography,
+  CircularProgress,
+} from "@mui/material";
 import { Close } from "@mui/icons-material";
 import { FlexBetweenBox } from "components";
 import useOnClickOutside from "hooks/useOnClickOutside";
 import useMount from "hooks/useMount";
 import "./styles.scss";
 
-const ConfirmModal = ({ opened, closeModal, children, action }) => {
+const ConfirmModal = ({
+  opened,
+  closeModal,
+  children,
+  action,
+  actionStatus,
+}) => {
   const [animationIn, setAnimationIn] = useState(false);
   const contentRef = useRef(null);
   const overlayRef = useRef(null);
@@ -105,17 +118,31 @@ const ConfirmModal = ({ opened, closeModal, children, action }) => {
               <Box px="10px">
                 <Typography variant="h5">{children}</Typography>
                 <FlexBetweenBox mt="15px">
-                  <Button
-                    style={{
-                      backgroundColor: "#034934",
-                      color: "#fff",
-                      width: "30%",
-                    }}
-                    variant="contained"
-                    onClick={action}
-                  >
-                    Yes
-                  </Button>
+                  {actionStatus === "loading" ? (
+                    <Box
+                      sx={{
+                        width: "30%",
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      <CircularProgress size={25}/>
+                    </Box>
+                  ) : (
+                    <Button
+                      style={{
+                        backgroundColor: "#034934",
+                        color: "#fff",
+                        width: "30%",
+                      }}
+                      variant="contained"
+                      onClick={action}
+                    >
+                      Yes
+                    </Button>
+                  )}
+
                   <Button
                     style={{
                       backgroundColor: "#49032e",

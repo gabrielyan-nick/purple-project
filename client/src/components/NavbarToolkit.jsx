@@ -23,10 +23,17 @@ const NavbarToolkit = ({ setMode, setLogout, fullName, direction = "row" }) => {
   const [isLogOutModalOpen, setIsLogOutModalOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSelectOpen, setIsSelectOpen] = useState(false);
+  const [logOutStatus, setLogOutStatus] = useState("idle");
   const theme = useTheme();
   const background = theme.palette.background.default;
   const altBackground = theme.palette.background.alt;
   const primaryColor = theme.palette.primary.main;
+
+  const onLogOut = () => {
+    setLogOutStatus("loading");
+    setLogout();
+    setLogOutStatus("idle");
+  };
 
   const onLogOutModalClose = () => {
     setIsLogOutModalOpen(false);
@@ -128,7 +135,8 @@ const NavbarToolkit = ({ setMode, setLogout, fullName, direction = "row" }) => {
       <ConfirmModal
         opened={isLogOutModalOpen}
         closeModal={onLogOutModalClose}
-        action={setLogout}
+        action={onLogOut}
+        actionStatus={logOutStatus}
       >
         Do you really want to log out?
       </ConfirmModal>

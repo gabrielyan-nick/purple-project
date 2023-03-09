@@ -38,10 +38,14 @@ const PostComment = memo(
       .slice(0, -3);
     const isMyComment = loggedInUserId === userId;
     const [isDelModalOpen, setIsDelModalOpen] = useState(false);
+    const [delLoadingStatus, setDelLoadingStatus] = useState("idle");
     const inputRef = useRef(null);
 
     const onDelComment = () => {
-      dispatch(deleteComment({ postId, commentId, token }));
+      setDelLoadingStatus("loading");
+      dispatch(deleteComment({ postId, commentId, token })).then(() =>
+        setDelLoadingStatus("idle")
+      );
     };
 
     useEffect(() => {
@@ -185,6 +189,7 @@ const PostComment = memo(
           opened={isDelModalOpen}
           closeModal={onCloseDelModal}
           action={onDelComment}
+          actionStatus={delLoadingStatus}
         >
           Do you really want to delete this comment?
         </ConfirmModal>

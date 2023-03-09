@@ -10,6 +10,7 @@ import {
   Typography,
   useTheme,
   IconButton,
+  CircularProgress,
 } from "@mui/material";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
@@ -63,6 +64,7 @@ const RegisterForm = ({ setForgotPass }) => {
   const [avatar, setAvatar] = useState(null);
   const [avatarUrl, setAvatarUrl] = useState(null);
   const [isPhotoModalOpen, setIsPhotoModalOpen] = useState(false);
+  const [logRegStatus, setLogRegStatus] = useState("idle");
 
   const onToggleShowPassword = () => {
     setShowPassword((showPassword) => !showPassword);
@@ -90,7 +92,7 @@ const RegisterForm = ({ setForgotPass }) => {
               }
             });
             formData.append("picturePath", url);
-
+            setLogRegStatus("loading");
             fetch(`${serverUrl}/auth/register`, {
               method: "POST",
               body: formData,
@@ -103,6 +105,7 @@ const RegisterForm = ({ setForgotPass }) => {
                   onSubmitProps.resetForm();
                   setRegisterError(false);
                   setPageType("login");
+                  setLogRegStatus("idle");
                 }
               })
               .catch((error) => {
@@ -121,17 +124,20 @@ const RegisterForm = ({ setForgotPass }) => {
   };
 
   const login = async (values, onSubmitProps) => {
+    setLogRegStatus("loading");
     const userLoginResponse = await fetch(`${serverUrl}/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(values),
     });
     const loggedIn = await userLoginResponse.json();
-
+    setLogRegStatus("idle");
     if (loggedIn && !loggedIn.msg) {
       onSubmitProps.resetForm();
-      dispatch(setLogin(loggedIn));
-      navigate("/home");
+
+      dispatch(setLogin(loggedIn)).then(() => {
+        navigate("/home");
+      });
     } else {
       setLoginError(loggedIn.msg);
     }
@@ -293,7 +299,7 @@ const RegisterForm = ({ setForgotPass }) => {
                     label="Occupation"
                     name="occupation"
                     id="occupation"
-                    sx={{ gridColumn: "span 2" }}
+                    sx={{ gridColumn: "span 2", mb: '30px' }}
                   />
                 </>
               ) : (
@@ -311,7 +317,11 @@ const RegisterForm = ({ setForgotPass }) => {
                       toggleShowPassword={onToggleShowPassword}
                       loginError={loginError}
                     />
-                    <Box display="flex" justifyContent="flex-end">
+                    <Box
+                      display="flex"
+                      justifyContent="flex-end"
+                      m="5px 0 25px"
+                    >
                       <Typography
                         onClick={() => setForgotPass(true)}
                         sx={{
@@ -349,20 +359,32 @@ const RegisterForm = ({ setForgotPass }) => {
                   Oops...something went wrong. Try once more
                 </Typography>
               )}
-              <Button
-                fullWidth
-                type="submit"
-                sx={{
-                  mt: "20px",
-                  backgroundColor: palette.buttons.loginBtn,
-                  color: palette.buttons.text,
-                  "&:hover": {
-                    backgroundColor: palette.buttons.loginBtnHover,
-                  },
-                }}
-              >
-                {isRegister ? "Register" : "Login"}
-              </Button>
+              {logRegStatus === "loading" ? (
+                <Box
+                  sx={{
+                    width: "100%",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <CircularProgress size={33} />
+                </Box>
+              ) : (
+                <Button
+                  fullWidth
+                  type="submit"
+                  sx={{
+                    backgroundColor: palette.buttons.loginBtn,
+                    color: palette.buttons.text,
+                    "&:hover": {
+                      backgroundColor: palette.buttons.loginBtnHover,
+                    },
+                  }}
+                >
+                  {isRegister ? "Register" : "Login"}
+                </Button>
+              )}
               <Button
                 sx={{
                   width: `${!isNonMobile ? "100%" : "62%"}`,
@@ -373,6 +395,7 @@ const RegisterForm = ({ setForgotPass }) => {
                     backgroundColor: palette.buttons.loginBtnHover,
                   },
                 }}
+                disabled={logRegStatus === "loading"}
                 onClick={() => {
                   setPageType(isLogin ? "register" : "login");
                   resetForm();
@@ -439,7 +462,7 @@ const PasswordInput = ({ showPassword, toggleShowPassword, loginError }) => {
       />
       <IconButton
         onClick={toggleShowPassword}
-        sx={{ position: "absolute", right: "5px", top: "17%" }}
+        sx={{ position: "absolute", right: "5px", top: "11%" }}
         size="small"
       >
         {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}

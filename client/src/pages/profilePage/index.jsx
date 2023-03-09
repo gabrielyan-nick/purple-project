@@ -9,13 +9,12 @@ import {
   FriendListWidget,
   ErrorBoundary,
 } from "components";
+import { serverUrl } from "config";
 
 const ProfilePage = () => {
   const [user, setUser] = useState(null);
   const { userId } = useParams();
   const { token } = useSelector((state) => state.auth);
-  const loggedInUser = useSelector((state) => state.auth.user);
-  const isMyProfile = userId === loggedInUser._id;
   const isNonMobileScreens = useMediaQuery("(min-width: 1000px)");
   const isSmallScreens = useMediaQuery("(max-width: 600px)");
   const [offset, setOffset] = useState(0);
@@ -25,7 +24,7 @@ const ProfilePage = () => {
   };
 
   const getUserInfo = async () => {
-    const response = await fetch(`http://localhost:3001/users/${userId}`, {
+    const response = await fetch(`${serverUrl}/users/${userId}`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,

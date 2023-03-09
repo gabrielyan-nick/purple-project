@@ -227,6 +227,7 @@ const SocialLink = ({ links, link, userId }) => {
         opened={isModalOpen}
         closeModal={onModalClose}
         action={onDeleteLink}
+        actionStatus={loadingStatus}
       >
         Do you really want to remove this link?
       </ConfirmModal>

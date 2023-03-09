@@ -10,7 +10,7 @@ export const getFriendList = createAsyncThunk(
   "friendList/getFriendList",
   async ({ userId, token }) => {
     const response = await fetch(
-      `${serverUrl}/${userId}/friends`,
+      `${serverUrl}/users/${userId}/friends`,
       {
         method: "GET",
         headers: {

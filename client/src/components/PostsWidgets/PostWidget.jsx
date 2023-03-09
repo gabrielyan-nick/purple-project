@@ -9,7 +9,14 @@ import {
   Edit,
   Save,
 } from "@mui/icons-material";
-import { Box, IconButton, InputBase, Typography, Button } from "@mui/material";
+import {
+  Box,
+  IconButton,
+  InputBase,
+  Typography,
+  Button,
+  CircularProgress,
+} from "@mui/material";
 import {
   FlexBetweenBox,
   Friend,
@@ -57,11 +64,17 @@ const PostWidget = memo(
       .slice(0, -3);
     const isMyPost = loggedInUserId === postUserId;
     const [isDelModalOpen, setIsDelModalOpen] = useState(false);
+    const [likeLoadingStatus, setLikeLoadingStatus] = useState("idle");
+    const [addCommentLoadingStatus, setAddCommentLoadingStatus] =
+      useState("idle");
     const postRef = useRef(null);
     const commentRef = useRef(null);
 
     const onPatchLike = () => {
-      dispatch(patchLike({ postId, token, loggedInUserId }));
+      setLikeLoadingStatus("loading");
+      dispatch(patchLike({ postId, token, loggedInUserId })).then(() =>
+        setLikeLoadingStatus("idle")
+      );
     };
 
     const onDelPost = () => {
@@ -85,7 +98,11 @@ const PostWidget = memo(
         userId: loggedInUserId,
         text: comment,
       };
-      dispatch(addComment({ postId, data, token })).then(() => setComment(""));
+      setAddCommentLoadingStatus("loading");
+      dispatch(addComment({ postId, data, token })).then(() => {
+        setComment("");
+        setAddCommentLoadingStatus("idle");
+      });
     };
 
     const changeEditingComment = (value) => {
@@ -213,7 +230,9 @@ const PostWidget = memo(
             <FlexBetweenBox gap="10px">
               <FlexBetweenBox gap="5px">
                 <IconButton size="small" onClick={onPatchLike}>
-                  {isLiked ? (
+                  {likeLoadingStatus === "loading" ? (
+                    <CircularProgress size={20} />
+                  ) : isLiked ? (
                     <FavoriteOutlined sx={{ color: palette.primary.main }} />
                   ) : (
                     <FavoriteBorderOutlined />
@@ -291,20 +310,35 @@ const PostWidget = memo(
                       boxShadow: `0px 0px 6px ${palette.primary.main}`,
                     }}
                   />
-                  <Button
-                    variant="contained"
-                    disabled={!comment}
-                    onClick={onAddComment}
-                    sx={{
-                      backgroundColor: palette.buttons.main,
-                      borderRadius: "5px",
-                      color: "#fff",
-                      width: "15%",
-                      "&:hover": { backgroundColor: palette.buttons.main },
-                    }}
-                  >
-                    Post
-                  </Button>
+                  {addCommentLoadingStatus === "loading" ? (
+                    <Box
+                      sx={{
+                        width: "15%",
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      <CircularProgress size={20} />
+                    </Box>
+                  ) : (
+                    <Button
+                      variant="contained"
+                      disabled={!comment}
+                      onClick={onAddComment}
+                      sx={{
+                        backgroundColor: palette.buttons.loginBtn,
+                        borderRadius: "5px",
+                        color: "#fff",
+                        width: "15%",
+                        "&:hover": {
+                          backgroundColor: palette.buttons.loginBtnHover,
+                        },
+                      }}
+                    >
+                      Post
+                    </Button>
+                  )}
                 </FlexBetweenBox>
               )}
             </Box>

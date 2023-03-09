@@ -3,6 +3,7 @@ import { BrowserRouter, Navigate, Routes, Route } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { createTheme } from "@mui/material/styles";
+import { SuspenseSpinner } from "components";
 import { themeSettings } from "theme";
 
 const HomePage = lazy(() => import("./pages/homePage"));
@@ -20,7 +21,7 @@ const App = () => {
       <BrowserRouter>
         <ThemeProvider theme={theme}>
           <CssBaseline />
-          <Suspense>
+          <Suspense fallback={<SuspenseSpinner />}>
             <Routes>
               <Route
                 path="/"
