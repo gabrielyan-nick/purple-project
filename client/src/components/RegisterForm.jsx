@@ -21,6 +21,7 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setLogin } from "./../store";
 import { FlexBetweenBox, PhotoModal, ForgotPassword } from "./index";
+import { serverUrl } from "config";
 
 const registerSchema = yup.object({
   firstName: yup.string().required("Required"),
@@ -90,7 +91,7 @@ const RegisterForm = ({ setForgotPass }) => {
             });
             formData.append("picturePath", url);
 
-            fetch("http://localhost:3001/auth/register", {
+            fetch(`${serverUrl}/auth/register`, {
               method: "POST",
               body: formData,
             })
@@ -120,7 +121,7 @@ const RegisterForm = ({ setForgotPass }) => {
   };
 
   const login = async (values, onSubmitProps) => {
-    const userLoginResponse = await fetch("http://localhost:3001/auth/login", {
+    const userLoginResponse = await fetch(`${serverUrl}/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(values),

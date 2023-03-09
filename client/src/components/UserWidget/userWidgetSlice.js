@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { serverUrl } from "config";
 
 const initialState = {
   userData: {},
@@ -9,7 +10,7 @@ const initialState = {
 export const fetchUserData = createAsyncThunk(
   "userWidget/fetchUserData",
   async ({ userId, token }) => {
-    const response = await fetch(`http://localhost:3001/users/${userId}`, {
+    const response = await fetch(`${serverUrl}/users/${userId}`, {
       method: "GET",
       headers: { Authorization: `Bearer ${token}` },
     });

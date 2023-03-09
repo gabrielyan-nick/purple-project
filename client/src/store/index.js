@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { serverUrl } from "config";
 
 const initialState = {
   mode: "light",
@@ -9,13 +10,16 @@ const initialState = {
 export const updateUserData = createAsyncThunk(
   "user/updateUserData",
   async ({ id, formData, token, initData }) => {
-    const response = await fetch(`http://localhost:3001/users/${id}`, {
-      method: "PATCH",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      body: formData,
-    });
+    const response = await fetch(
+      `${serverUrl}/users/${id}`,
+      {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      }
+    );
     const user = await response.json();
     if (user.message) return initData;
     return user;
@@ -26,7 +30,7 @@ export const patchFriend = createAsyncThunk(
   "user/patchFriend",
   async ({ _id, friendId, token }) => {
     const response = await fetch(
-      `http://localhost:3001/users/${_id}/${friendId}`,
+      `${serverUrl}/users/${_id}/${friendId}`,
       {
         method: "PATCH",
         headers: {
@@ -45,7 +49,7 @@ export const getMyFriendList = createAsyncThunk(
   "user/getMyFriendList",
   async ({ userId, token }) => {
     const response = await fetch(
-      `http://localhost:3001/users/${userId}/friends`,
+      `${serverUrl}/users/${userId}/friends`,
       {
         method: "GET",
         headers: {

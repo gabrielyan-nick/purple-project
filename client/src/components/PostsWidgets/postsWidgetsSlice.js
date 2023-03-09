@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { serverUrl } from "config";
 
 const initialState = {
   posts: [],
@@ -11,7 +12,7 @@ export const fetchPosts = createAsyncThunk(
   "posts/fetchPosts",
   async ({ token, userId = null, isUsersPosts = false }) => {
     const response = await fetch(
-      `http://localhost:3001/posts${
+      `${serverUrl}/posts${
         isUsersPosts ? `/${userId}/posts` : ""
       }?offset=0&limit=6`,
       {
@@ -29,7 +30,7 @@ export const lazzyLoadPosts = createAsyncThunk(
   "posts/lazzyLoadPosts",
   async ({ token, userId, offset, limit = 5, isUsersPosts = false }) => {
     const response = await fetch(
-      `http://localhost:3001/posts${
+      `${serverUrl}/posts${
         isUsersPosts ? `/${userId}/posts` : ""
       }?offset=${offset}&limit=${limit}`,
       {
@@ -46,7 +47,7 @@ export const lazzyLoadPosts = createAsyncThunk(
 export const addMyPost = createAsyncThunk(
   "posts/addMyPost",
   async ({ formData, token, initPosts }) => {
-    const response = await fetch(`http://localhost:3001/posts`, {
+    const response = await fetch(`${serverUrl}/posts`, {
       method: "POST",
       headers: { Authorization: `Bearer ${token}` },
       body: formData,
@@ -60,7 +61,7 @@ export const addMyPost = createAsyncThunk(
 export const deletePost = createAsyncThunk(
   "posts/deletePost",
   async ({ postId, token }) => {
-    const response = await fetch(`http://localhost:3001/posts/${postId}`, {
+    const response = await fetch(`${serverUrl}/posts/${postId}`, {
       method: "DELETE",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -75,7 +76,7 @@ export const deletePost = createAsyncThunk(
 export const updatePost = createAsyncThunk(
   "posts/updatePost",
   async ({ postId, data, token }) => {
-    const response = await fetch(`http://localhost:3001/posts/${postId}`, {
+    const response = await fetch(`${serverUrl}/posts/${postId}`, {
       method: "PATCH",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -93,7 +94,7 @@ export const addComment = createAsyncThunk(
   "posts/addComment",
   async ({ postId, data, token }) => {
     const response = await fetch(
-      `http://localhost:3001/posts/${postId}/comment`,
+      `${serverUrl}/posts/${postId}/comment`,
       {
         method: "POST",
         headers: {
@@ -113,7 +114,7 @@ export const deleteComment = createAsyncThunk(
   "posts/deleteComment",
   async ({ postId, commentId, token }) => {
     const response = await fetch(
-      `http://localhost:3001/posts/${postId}/comment/${commentId}`,
+      `${serverUrl}/posts/${postId}/comment/${commentId}`,
       {
         method: "DELETE",
         headers: {
@@ -131,7 +132,7 @@ export const updateComment = createAsyncThunk(
   "posts/updateComment",
   async ({ postId, commentId, data, token }) => {
     const response = await fetch(
-      `http://localhost:3001/posts/${postId}/comment/${commentId}`,
+      `${serverUrl}/posts/${postId}/comment/${commentId}`,
       {
         method: "PUT",
         headers: {
@@ -150,7 +151,7 @@ export const updateComment = createAsyncThunk(
 export const patchLike = createAsyncThunk(
   "posts/patchLike",
   async ({ postId, token, loggedInUserId }) => {
-    const response = await fetch(`http://localhost:3001/posts/${postId}/like`, {
+    const response = await fetch(`${serverUrl}/posts/${postId}/like`, {
       method: "PATCH",
       headers: {
         Authorization: `Bearer ${token}`,

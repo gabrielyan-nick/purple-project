@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { serverUrl } from "config";
 
 const initialState = {
   friendList: [],
@@ -9,7 +10,7 @@ export const getFriendList = createAsyncThunk(
   "friendList/getFriendList",
   async ({ userId, token }) => {
     const response = await fetch(
-      `http://localhost:3001/users/${userId}/friends`,
+      `${serverUrl}/${userId}/friends`,
       {
         method: "GET",
         headers: {
