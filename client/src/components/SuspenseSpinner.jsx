@@ -12,7 +12,7 @@ const SuspenseSpinner = () => {
       justifyContent="center"
       alignItems="center"
     >
-      <CircularProgress size={50} color={palette.primary.main}/>
+      <CircularProgress size={50}/>
     </Box>
   );
 };
