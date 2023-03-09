@@ -87,7 +87,7 @@ export const forgotPass = async (req, res) => {
       subject: "Reset password",
       html: `
         <p>To reset your password, follow the link:</p>
-        <a href="http://localhost:3000/reset-password/${resetToken}">reset password</a>
+        <a href="https://purple-project13.web.app/reset-password/${resetToken}">reset password</a>
         <p>Link is valid for one hour.</p>
       `,
     };
