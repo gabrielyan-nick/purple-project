@@ -10,6 +10,7 @@ const HomePage = lazy(() => import("./pages/homePage"));
 const LoginPage = lazy(() => import("./pages/loginPage"));
 const ProfilePage = lazy(() => import("./pages/profilePage"));
 const ResetPasswordPage = lazy(() => import("./pages/resetPasswordPage"));
+const ErrorPage = lazy(() => import("./pages/errorPage"));
 
 const App = () => {
   const mode = useSelector((state) => state.auth.mode);
@@ -21,26 +22,29 @@ const App = () => {
       <BrowserRouter>
         <ThemeProvider theme={theme}>
           <CssBaseline />
-          <Suspense fallback={<SuspenseSpinner />}>
-            <Routes>
-              <Route
-                path="/"
-                element={!isAuth ? <LoginPage /> : <Navigate to={"/home"} />}
-              />
-              <Route
-                path="/home"
-                element={isAuth ? <HomePage /> : <Navigate to={"/"} />}
-              />
-              <Route
-                path="/profile/:userId"
-                element={isAuth ? <ProfilePage /> : <Navigate to={"/"} />}
-              />
-              <Route
-                path="/reset-password/:token"
-                element={<ResetPasswordPage />}
-              />
-            </Routes>
-          </Suspense>
+          <main>
+            <Suspense fallback={<SuspenseSpinner />}>
+              <Routes>
+                <Route
+                  path="/"
+                  element={!isAuth ? <LoginPage /> : <Navigate to={"/home"} />}
+                />
+                <Route
+                  path="/home"
+                  element={isAuth ? <HomePage /> : <Navigate to={"/"} />}
+                />
+                <Route
+                  path="/profile/:userId"
+                  element={isAuth ? <ProfilePage /> : <Navigate to={"/"} />}
+                />
+                <Route
+                  path="/reset-password/:resetToken"
+                  element={<ResetPasswordPage />}
+                />
+                <Route path={"*"} element={<ErrorPage />} />
+              </Routes>
+            </Suspense>
+          </main>
         </ThemeProvider>
       </BrowserRouter>
     </div>

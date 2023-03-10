@@ -13,6 +13,7 @@ import {
   Fade,
 } from "@mui/material";
 import { WidgetWrapper, FlexBetweenBox } from "./index";
+import { serverUrl } from "config";
 
 const ResetPassword = ({ resetToken }) => {
   const [password, setPassword] = useState("");
@@ -44,7 +45,7 @@ const ResetPassword = ({ resetToken }) => {
       formData.append("token", resetToken);
 
       setLoadingStatus("loading");
-      fetch(`http://localhost:3001/auth/reset-password`, {
+      fetch(`${serverUrl}/auth/reset-password`, {
         method: "POST",
         body: formData,
       })

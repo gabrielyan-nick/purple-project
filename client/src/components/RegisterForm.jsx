@@ -49,8 +49,13 @@ const initialValuesRegister = {
   picture: "",
 };
 
+const initialValuesLogin = {
+  email: "",
+  password: "",
+};
+
 const RegisterForm = ({ setForgotPass }) => {
-  const [pageType, setPageType] = useState("login");
+  const [pageType, setPageType] = useState("register");
   const [showPassword, setShowPassword] = useState(false);
   const [userExist, setUserExist] = useState(false);
   const [loginError, setLoginError] = useState(false);
@@ -70,29 +75,36 @@ const RegisterForm = ({ setForgotPass }) => {
     setShowPassword((showPassword) => !showPassword);
   };
 
+  const onChangeToForgotPass = () => {
+    if (logRegStatus !== "loading") setForgotPass(true);
+  };
+
   const onDisableLoginError = () => {
     setUserExist(false);
     setLoginError(false);
   };
 
+  const onChangeForm = () => {
+    setPageType(isLogin ? "register" : "login");
+    setRegisterError(false);
+  };
+
   const register = async (values, onSubmitProps) => {
+    console.log("sdf");
+    setLogRegStatus("loading");
     const imageRef = ref(storage, `avatars/${avatar.name}`);
     uploadBytes(imageRef, avatar)
       .then(() => {
         getDownloadURL(imageRef)
           .then((url) => {
-            if (!avatar) {
-              console.log("Avatar file is missing or not yet uploaded");
-              return;
-            }
             const formData = new FormData();
             Object.keys(values).forEach((key) => {
               if (key !== "picture") {
                 formData.append(key, values[key]);
               }
             });
-            formData.append("picturePath", url);
-            setLogRegStatus("loading");
+            formData.append("picturePath", "url");
+
             fetch(`${serverUrl}/auth/register`, {
               method: "POST",
               body: formData,
@@ -110,6 +122,7 @@ const RegisterForm = ({ setForgotPass }) => {
               })
               .catch((error) => {
                 setRegisterError(true);
+                console.log(error);
               });
           })
           .catch((error) => {
@@ -142,11 +155,13 @@ const RegisterForm = ({ setForgotPass }) => {
       setLoginError(loggedIn.msg);
     }
   };
-
+  console.log(isRegister);
   const handleFormSubmit = async (values, onSubmitProps) => {
+
     onDisableLoginError();
-    if (isLogin) await login(values, onSubmitProps);
+
     if (isRegister) await register(values, onSubmitProps);
+    if (isLogin) await login(values, onSubmitProps);
   };
 
   const onSetAvatar = async (e) => {
@@ -299,7 +314,7 @@ const RegisterForm = ({ setForgotPass }) => {
                     label="Occupation"
                     name="occupation"
                     id="occupation"
-                    sx={{ gridColumn: "span 2", mb: '30px' }}
+                    sx={{ gridColumn: "span 2", mb: "30px" }}
                   />
                 </>
               ) : (
@@ -323,7 +338,7 @@ const RegisterForm = ({ setForgotPass }) => {
                       m="5px 0 25px"
                     >
                       <Typography
-                        onClick={() => setForgotPass(true)}
+                        onClick={onChangeToForgotPass}
                         sx={{
                           textDecoration: "underline",
                           marginLeft: "auto",
@@ -397,9 +412,8 @@ const RegisterForm = ({ setForgotPass }) => {
                 }}
                 disabled={logRegStatus === "loading"}
                 onClick={() => {
-                  setPageType(isLogin ? "register" : "login");
+                  onChangeForm();
                   resetForm();
-                  setRegisterError(false);
                 }}
               >
                 {isLogin

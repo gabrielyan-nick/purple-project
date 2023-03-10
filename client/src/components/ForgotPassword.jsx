@@ -10,6 +10,7 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { WidgetWrapper, FlexBetweenBox } from "./index";
+import { serverUrl } from "config";
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
@@ -19,12 +20,13 @@ const ForgotPassword = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    setMessage('')
     if (email) {
       const formData = new FormData();
       formData.append("email", email);
 
       setLoadingStatus("loading");
-      fetch(`http://localhost:3001/auth/forgot-password`, {
+      fetch(`${serverUrl}/auth/forgot-password`, {
         method: "POST",
         body: formData,
       })
