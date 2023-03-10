@@ -11,19 +11,13 @@ body,
   overflow-x: hidden;
 }
 
-.MuiFormHelperText-root.Mui-error {
-  position: absolute;
-  bottom: -20px;
-  font-size: 12px;
-}
-
-.password-error-text {
-  color: #d32f2f;
-  position: absolute;
-  font-size: 12px;
-  bottom: 15px;
-  left: 10px;
-}
+// .password-error-text {
+//   color: #d32f2f;
+//   position: absolute;
+//   font-size: 12px;
+//   bottom: 15px;
+//   left: 10px;
+// }
 
 .MuiInputBase-root {
   padding-right: 20px;

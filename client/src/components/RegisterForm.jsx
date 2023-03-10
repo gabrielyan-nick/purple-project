@@ -1,5 +1,4 @@
-import { React, useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { React, useState } from "react";
 import { ref, uploadBytes, getDownloadURL } from "@firebase/storage";
 import { storage } from "../firebase";
 import {
@@ -12,16 +11,11 @@ import {
   IconButton,
   CircularProgress,
 } from "@mui/material";
-import VisibilityIcon from "@mui/icons-material/Visibility";
-import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
-import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import { AddAPhoto } from "@mui/icons-material";
-import { Formik, Form, useField, ErrorMessage } from "formik";
+import { Formik, Form } from "formik";
 import * as yup from "yup";
-import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { setLogin } from "./../store";
-import { FlexBetweenBox, PhotoModal, ForgotPassword } from "./index";
+import { PhotoModal, Modal } from "./index";
+import { TextInput, PasswordInput, LoginMailInput } from "./formInputs";
 import { serverUrl } from "config";
 
 const registerSchema = yup.object({
@@ -31,12 +25,7 @@ const registerSchema = yup.object({
   password: yup.string().min(3).required("Required"),
   location: yup.string().required("Required"),
   occupation: yup.string().required("Required"),
-  picture: yup.string().required("Required"),
-});
-
-const loginSchema = yup.object({
-  email: yup.string().email("Invalid email").required("Required"),
-  password: yup.string().min(3).required("Required"),
+  picturePath: yup.string().required("Required"),
 });
 
 const initialValuesRegister = {
@@ -46,52 +35,32 @@ const initialValuesRegister = {
   password: "",
   location: "",
   occupation: "",
-  picture: "",
+  picturePath: "",
 };
 
-const initialValuesLogin = {
-  email: "",
-  password: "",
-};
-
-const RegisterForm = ({ setForgotPass }) => {
-  const [pageType, setPageType] = useState("register");
+const RegisterForm = ({ setFormType }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [userExist, setUserExist] = useState(false);
-  const [loginError, setLoginError] = useState(false);
   const [registerError, setRegisterError] = useState(false);
-  const { palette } = useTheme();
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const isNonMobile = useMediaQuery("(min-width: 600px)");
-  const isLogin = pageType === "login";
-  const isRegister = pageType === "register";
+  const [regStatus, setRegStatus] = useState("idle");
   const [avatar, setAvatar] = useState(null);
   const [avatarUrl, setAvatarUrl] = useState(null);
   const [isPhotoModalOpen, setIsPhotoModalOpen] = useState(false);
-  const [logRegStatus, setLogRegStatus] = useState("idle");
+  const [isGoToLoginModalOpen, setIsGoToLoginModalOpen] = useState(false);
+  const isNonMobile = useMediaQuery("(min-width: 600px)");
+  const { palette } = useTheme();
+
+  const onChangeForm = () => {
+    setFormType("login");
+  };
 
   const onToggleShowPassword = () => {
     setShowPassword((showPassword) => !showPassword);
   };
 
-  const onChangeToForgotPass = () => {
-    if (logRegStatus !== "loading") setForgotPass(true);
-  };
-
-  const onDisableLoginError = () => {
-    setUserExist(false);
-    setLoginError(false);
-  };
-
-  const onChangeForm = () => {
-    setPageType(isLogin ? "register" : "login");
+  const handleFormSubmit = async (values, onSubmitProps) => {
+    setRegStatus("loading");
     setRegisterError(false);
-  };
-
-  const register = async (values, onSubmitProps) => {
-    console.log("sdf");
-    setLogRegStatus("loading");
     const imageRef = ref(storage, `avatars/${avatar.name}`);
     uploadBytes(imageRef, avatar)
       .then(() => {
@@ -99,11 +68,11 @@ const RegisterForm = ({ setForgotPass }) => {
           .then((url) => {
             const formData = new FormData();
             Object.keys(values).forEach((key) => {
-              if (key !== "picture") {
+              if (key !== "picturePath") {
                 formData.append(key, values[key]);
               }
             });
-            formData.append("picturePath", "url");
+            formData.append("picturePath", url);
 
             fetch(`${serverUrl}/auth/register`, {
               method: "POST",
@@ -112,12 +81,15 @@ const RegisterForm = ({ setForgotPass }) => {
               .then((res) => res.json())
               .then((res) => {
                 if (res === "User already exist") setUserExist(true);
-                if (res.error) setRegisterError(true);
+                if (res.error) {
+                  setRegisterError(true);
+                  setRegStatus("idle");
+                }
                 if (res && res !== "User already exist" && !res.error) {
                   onSubmitProps.resetForm();
                   setRegisterError(false);
-                  setPageType("login");
-                  setLogRegStatus("idle");
+                  setRegStatus("idle");
+                  setIsGoToLoginModalOpen(true);
                 }
               })
               .catch((error) => {
@@ -126,7 +98,7 @@ const RegisterForm = ({ setForgotPass }) => {
               });
           })
           .catch((error) => {
-            console.log(error.message, "error getting the image url");
+            console.log(error.message);
             setRegisterError(true);
           });
       })
@@ -136,35 +108,8 @@ const RegisterForm = ({ setForgotPass }) => {
       });
   };
 
-  const login = async (values, onSubmitProps) => {
-    setLogRegStatus("loading");
-    const userLoginResponse = await fetch(`${serverUrl}/auth/login`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(values),
-    });
-    const loggedIn = await userLoginResponse.json();
-    setLogRegStatus("idle");
-    if (loggedIn && !loggedIn.msg) {
-      onSubmitProps.resetForm();
-
-      dispatch(setLogin(loggedIn)).then(() => {
-        navigate("/home");
-      });
-    } else {
-      setLoginError(loggedIn.msg);
-    }
-  };
-  console.log(isRegister);
-  const handleFormSubmit = async (values, onSubmitProps) => {
-
-    onDisableLoginError();
-
-    if (isRegister) await register(values, onSubmitProps);
-    if (isLogin) await login(values, onSubmitProps);
-  };
-
-  const onSetAvatar = async (e) => {
+  const onSetAvatar = async (e, setFieldValue) => {
+    setFieldValue("picturePath", e.target.files[0].name);
     const file = e.target.files[0];
     setAvatar(file);
     if (file) {
@@ -178,203 +123,165 @@ const RegisterForm = ({ setForgotPass }) => {
 
   const openPhotoModal = () => setIsPhotoModalOpen(true);
   const closePhotoModal = () => setIsPhotoModalOpen(false);
+  const closeGoToLoginModal = () => setIsGoToLoginModalOpen(false);
 
   return (
     <>
       <Formik
         initialValues={initialValuesRegister}
-        validationSchema={isLogin ? loginSchema : registerSchema}
+        validationSchema={registerSchema}
         onSubmit={handleFormSubmit}
       >
-        {({ values, errors, touched, setFieldValue, resetForm }) => (
+        {({ values, errors, touched, setFieldValue, resetForm, formik }) => (
           <Form>
             <Box
               display="grid"
-              rowGap="25px"
               gridTemplateColumns="repeat(2, 1fr)"
+              rowGap="25px"
+              mb="25px"
               sx={{
                 "& > div": { gridColumn: isNonMobile ? undefined : "span 2" },
               }}
             >
-              {isRegister ? (
-                <>
-                  <Box gridColumn="1">
-                    <TextInput
-                      label="First name"
-                      name="firstName"
-                      id="firstName"
-                      sx={{ marginBottom: "25px", width: "100%" }}
-                    />
-                    <TextInput
-                      label="Last name"
-                      name="lastName"
-                      id="lastName"
-                      sx={{ width: "100%" }}
-                    />
-                  </Box>
-                  <Box
-                    gridColumn="2"
-                    sx={{
-                      height: "130px",
-                      display: "flex",
-                      justifyContent: `${isNonMobile ? "flex-end" : "center"}`,
-                      alignItems: "center",
-                      gap: "15px",
-                      order: `${!isNonMobile ? "-1" : "0"}`,
-                    }}
-                  >
-                    <Box
-                      width="110px"
-                      height="110px"
-                      sx={{
-                        boxShadow: `0px 0px 6px ${palette.primary.main}`,
+              <Box
+                gridColumn="1"
+                sx={{ display: "flex", flexDirection: "column", gap: "25px" }}
+              >
+                <TextInput label="First name" name="firstName" id="firstName" />
+                <TextInput label="Last name" name="lastName" id="lastName" />
+              </Box>
+
+              <Box
+                gridColumn="2"
+                sx={{
+                  height: "130px",
+                  display: "flex",
+                  justifyContent: `${isNonMobile ? "flex-end" : "center"}`,
+                  alignItems: "center",
+                  gap: "15px",
+                  order: `${!isNonMobile ? "-1" : "0"}`,
+                }}
+              >
+                <Box
+                  width="110px"
+                  height="110px"
+                  sx={{
+                    boxShadow: `0px 0px 6px ${palette.primary.main}`,
+                    borderRadius: "50%",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  {avatarUrl ? (
+                    <img
+                      src={avatarUrl}
+                      alt="user"
+                      style={{
+                        objectFit: "cover",
                         borderRadius: "50%",
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
+                        cursor: "pointer",
                       }}
-                    >
-                      {avatarUrl ? (
-                        <img
-                          src={avatarUrl}
-                          alt="user"
-                          style={{
-                            objectFit: "cover",
-                            borderRadius: "50%",
-                            cursor: "pointer",
-                          }}
-                          width="120px"
-                          height="120px"
-                          onClick={openPhotoModal}
-                        />
+                      width="120px"
+                      height="120px"
+                      onClick={openPhotoModal}
+                    />
+                  ) : (
+                    <>
+                      {errors.picturePath && touched.picturePath ? (
+                        <Typography
+                          variant="subtitle1"
+                          sx={{ userSelect: "none", color: "#d32f2f" }}
+                        >
+                          Require
+                        </Typography>
                       ) : (
-                        <>
-                          {errors.picture && touched.picture ? (
-                            <Typography
-                              variant="subtitle1"
-                              sx={{ userSelect: "none", color: "#d32f2f" }}
-                            >
-                              Require
-                            </Typography>
-                          ) : (
-                            <Typography
-                              variant="subtitle2"
-                              sx={{ userSelect: "none" }}
-                            >
-                              Add photo
-                            </Typography>
-                          )}
-                        </>
+                        <Typography
+                          color={palette.primary.main}
+                          variant="subtitle1"
+                          sx={{ userSelect: "none" }}
+                        >
+                          Add photo
+                        </Typography>
                       )}
-                    </Box>
-                    <IconButton
-                      component="label"
-                      htmlFor="picture"
-                      sx={{ marginRight: "10px" }}
-                    >
-                      <AddAPhoto
-                        sx={{
-                          "&:hover": {
-                            color: palette.primary.main,
-                            cursor: "pointer",
-                          },
-                        }}
-                      />
-                      <input
-                        label="picture"
-                        name="picture"
-                        id="picture"
-                        type="file"
-                        hidden
-                        accept="image/png, image/jpg, image/jpeg"
-                        onChange={onSetAvatar}
-                      />
-                    </IconButton>
-                  </Box>
-                  <TextInput
-                    userExist={userExist}
-                    label="Email"
-                    name="email"
-                    id="email"
-                    sx={{ gridColumn: "span 2" }}
+                    </>
+                  )}
+                </Box>
+                <IconButton
+                  component="label"
+                  htmlFor="picturePath"
+                  sx={{ marginRight: "10px" }}
+                >
+                  <AddAPhoto
+                    sx={{
+                      "&:hover": {
+                        color: palette.primary.main,
+                        cursor: "pointer",
+                      },
+                    }}
                   />
-                  <div style={{ gridColumn: "span 2", position: "relative" }}>
-                    <PasswordInput
-                      showPassword={showPassword}
-                      toggleShowPassword={onToggleShowPassword}
-                    />
-                  </div>
-                  <TextInput
-                    label="Location"
-                    name="location"
-                    id="location"
-                    sx={{ gridColumn: "span 2" }}
+                  <input
+                    label="picturePath"
+                    name="picturePath"
+                    id="picturePath"
+                    type="file"
+                    hidden
+                    accept="image/png, image/jpg, image/jpeg"
+                    onChange={(e) => onSetAvatar(e, setFieldValue)}
                   />
-                  <TextInput
-                    label="Occupation"
-                    name="occupation"
-                    id="occupation"
-                    sx={{ gridColumn: "span 2", mb: "30px" }}
-                  />
-                </>
-              ) : (
-                <>
-                  <TextInput
-                    loginError={loginError}
-                    label="Email"
-                    name="email"
-                    id="email"
-                    sx={{ gridColumn: "span 2" }}
-                  />
-                  <div style={{ gridColumn: "span 2", position: "relative" }}>
-                    <PasswordInput
-                      showPassword={showPassword}
-                      toggleShowPassword={onToggleShowPassword}
-                      loginError={loginError}
-                    />
-                    <Box
-                      display="flex"
-                      justifyContent="flex-end"
-                      m="5px 0 25px"
-                    >
-                      <Typography
-                        onClick={onChangeToForgotPass}
-                        sx={{
-                          textDecoration: "underline",
-                          marginLeft: "auto",
-                          cursor: "pointer",
-                          "&:hover": {
-                            color: palette.primary.main,
-                          },
-                        }}
-                      >
-                        Forgot password
-                      </Typography>
-                    </Box>
-                  </div>
-                </>
-              )}
+                </IconButton>
+              </Box>
             </Box>
+
             <Box
-              sx={{ position: "relative" }}
-              display="flex"
-              flexDirection="column"
-              alignItems="center"
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "25px",
+                position: "relative",
+              }}
             >
+              <LoginMailInput
+                label="Email"
+                name="email"
+                id="email"
+                userExist={userExist}
+                loginError={registerError}
+              />
+              <div style={{ gridColumn: "span 2", position: "relative" }}>
+                <PasswordInput
+                  name="password"
+                  label="Password"
+                  id="password"
+                  showPassword={showPassword}
+                  toggleShowPassword={onToggleShowPassword}
+                />
+              </div>
+              <TextInput label="Location" name="location" id="location" />
+              <TextInput label="Occupation" name="occupation" id="occupation" />
               {registerError && (
                 <Typography
                   color="#d32f2f"
                   sx={{
                     position: "absolute",
-                    top: "4px",
+                    bottom: "-25px",
                     left: "20%",
                     width: "70%",
                   }}
                 >
-                  Oops...something went wrong. Try once more
+                  Oops...something went wrong. Try again later
                 </Typography>
               )}
-              {logRegStatus === "loading" ? (
+            </Box>
+
+            <Box
+              sx={{ position: "relative" }}
+              display="flex"
+              flexDirection="column"
+              alignItems="center"
+              mt="35px"
+            >
+              {regStatus === "loading" && !userExist ? (
                 <Box
                   sx={{
                     width: "100%",
@@ -397,28 +304,26 @@ const RegisterForm = ({ setForgotPass }) => {
                     },
                   }}
                 >
-                  {isRegister ? "Register" : "Login"}
+                  Register
                 </Button>
               )}
               <Button
                 sx={{
-                  width: `${!isNonMobile ? "100%" : "62%"}`,
-                  mt: "10px",
+                  width: "62%",
+                  mt: "15px",
                   backgroundColor: palette.buttons.loginBtn,
                   color: palette.buttons.text,
                   "&:hover": {
                     backgroundColor: palette.buttons.loginBtnHover,
                   },
                 }}
-                disabled={logRegStatus === "loading"}
+                disabled={regStatus === "loading" && !userExist}
                 onClick={() => {
                   onChangeForm();
                   resetForm();
                 }}
               >
-                {isLogin
-                  ? "Don't have an account? Sign up here"
-                  : "Already have an account? Login here"}
+                {isNonMobile ? "Already have an account? Login here" : "Login"}
               </Button>
             </Box>
           </Form>
@@ -432,58 +337,16 @@ const RegisterForm = ({ setForgotPass }) => {
         closeModal={closePhotoModal}
         isInRegForm
       />
-    </>
-  );
-};
 
-const TextInput = ({ loginError, userExist = false, ...props }) => {
-  const [field, meta] = useField(props);
-  return (
-    <>
-      <TextField
-        {...field}
-        {...props}
-        label={props.label}
-        error={
-          (Boolean(meta.touched) && Boolean(meta.error)) ||
-          userExist ||
-          Boolean(loginError)
-        }
-        helperText={
-          meta.touched && !userExist && !loginError
-            ? meta.error
-            : meta.touched && userExist
-            ? "User with this email already exist"
-            : meta.touched && loginError === "User does not exist"
-            ? "User does not exist"
-            : null
-        }
-      />
-    </>
-  );
-};
-
-const PasswordInput = ({ showPassword, toggleShowPassword, loginError }) => {
-  return (
-    <>
-      <TextInput
-        label="Password"
-        name="password"
-        id="password"
-        type={`${showPassword ? "text" : "password"}`}
-        sx={{ width: "100%" }}
-        loginError={loginError}
-      />
-      <IconButton
-        onClick={toggleShowPassword}
-        sx={{ position: "absolute", right: "5px", top: "11%" }}
-        size="small"
+      <Modal
+        opened={isGoToLoginModalOpen}
+        closeModal={closeGoToLoginModal}
+        action={onChangeForm}
       >
-        {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
-      </IconButton>
-      {loginError === "Invalid credentials" && (
-        <p className="password-error-text">Invalid password</p>
-      )}
+        <Typography variant="h5" fontWeight="500">
+          Thank you for registering. Now you can log in using your credentials.
+        </Typography>
+      </Modal>
     </>
   );
 };

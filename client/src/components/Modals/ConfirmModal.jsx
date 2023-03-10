@@ -116,7 +116,7 @@ const ConfirmModal = ({
                 </IconButton>
               </Box>
               <Box px="10px">
-                <Typography variant="h5">{children}</Typography>
+                <Typography variant="h5" fontWeight='500'>{children}</Typography>
                 <FlexBetweenBox mt="15px">
                   {actionStatus === "loading" ? (
                     <Box

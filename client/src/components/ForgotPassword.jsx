@@ -92,7 +92,7 @@ const ForgotPassword = () => {
                 "&:hover": {
                   backgroundColor: palette.buttons.loginBtnHover,
                 },
-              }}
+              }}d
             >
               Send
             </Button>

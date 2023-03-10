@@ -11,6 +11,7 @@ const LoginPage = lazy(() => import("./pages/loginPage"));
 const ProfilePage = lazy(() => import("./pages/profilePage"));
 const ResetPasswordPage = lazy(() => import("./pages/resetPasswordPage"));
 const ErrorPage = lazy(() => import("./pages/errorPage"));
+const ForgotPasswordPage = lazy(() => import("./pages/forgotPasswordPage"));
 
 const App = () => {
   const mode = useSelector((state) => state.auth.mode);
@@ -40,6 +41,10 @@ const App = () => {
                 <Route
                   path="/reset-password/:resetToken"
                   element={<ResetPasswordPage />}
+                />
+                <Route
+                  path="/forgot-password"
+                  element={<ForgotPasswordPage />}
                 />
                 <Route path={"*"} element={<ErrorPage />} />
               </Routes>

@@ -142,7 +142,7 @@ const NavbarToolkit = ({ setMode, setLogout, fullName, direction = "row" }) => {
       </ConfirmModal>
 
       <Modal opened={isModalOpen} closeModal={onModalClose}>
-        <Typography variant="h5">
+        <Typography variant="h5" fontWeight='500'>
           This functionality is under develop
         </Typography>
       </Modal>

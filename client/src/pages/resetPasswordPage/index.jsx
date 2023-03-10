@@ -30,9 +30,6 @@ const ResetPasswordPage = () => {
     dispatch(setMode());
   };
 
-  const navOnLoginPage = () => {
-    navigate("/");
-  };
 
   return (
     <Box>
@@ -47,9 +44,9 @@ const ResetPasswordPage = () => {
         }}
       >
         {mode === "light" ? (
-          <LightLogo navigate={navOnLoginPage} pointer="pointer" />
+          <LightLogo pointer="pointer" />
         ) : (
-          <DarkLogo navigate={navOnLoginPage} pointer="pointer" />
+          <DarkLogo pointer="pointer" />
         )}
         <IconButton onClick={onSetMode} sx={{ height: "40px" }}>
           {mode === "dark" ? (

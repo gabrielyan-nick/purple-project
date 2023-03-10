@@ -251,10 +251,6 @@ const PostWidget = memo(
                 <Typography>{comments.length}</Typography>
               </FlexBetweenBox>
             </FlexBetweenBox>
-
-            <IconButton size="small" sx={{ marginRight: "-5px" }}>
-              <ShareOutlined sx={{ color: palette.primary.main }} />
-            </IconButton>
           </FlexBetweenBox>
 
           {isComments && (

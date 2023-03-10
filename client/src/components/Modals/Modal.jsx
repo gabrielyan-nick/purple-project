@@ -1,17 +1,23 @@
 import React, { useRef, useEffect, useState } from "react";
 import { CSSTransition } from "react-transition-group";
-import { IconButton, useTheme, Box, Button } from "@mui/material";
+import {
+  IconButton,
+  useTheme,
+  Box,
+  Button,
+  useMediaQuery,
+} from "@mui/material";
 import { Close } from "@mui/icons-material";
-import { FlexBetweenBox } from "components";
 import useOnClickOutside from "hooks/useOnClickOutside";
 import useMount from "hooks/useMount";
 import "./styles.scss";
 
-const Modal = ({ opened, closeModal, children }) => {
+const Modal = ({ opened, closeModal, action = null, children }) => {
   const [animationIn, setAnimationIn] = useState(false);
   const contentRef = useRef(null);
   const overlayRef = useRef(null);
   const { mounted } = useMount({ opened });
+  const isNonMobile = useMediaQuery("(min-width: 600px)");
   const { palette } = useTheme();
 
   useEffect(() => {
@@ -54,6 +60,7 @@ const Modal = ({ opened, closeModal, children }) => {
   };
 
   const onCloseModal = () => {
+    action && action();
     closeModal();
   };
 
@@ -83,7 +90,11 @@ const Modal = ({ opened, closeModal, children }) => {
           unmountOnExit
           classNames="modal-content"
         >
-          <div className="modal-content" ref={contentRef}>
+          <div
+            className="modal-content"
+            style={{ maxWidth: `${isNonMobile ? "300px" : "75%"}` }}
+            ref={contentRef}
+          >
             <Box
               sx={{
                 backgroundColor: palette.modal.bg,
@@ -98,9 +109,13 @@ const Modal = ({ opened, closeModal, children }) => {
                 justifyContent="flex-end"
                 marginBottom="5px"
               >
-                <IconButton onClick={onCloseModal} size="small">
-                  <Close sx={{ "&:hover": { color: palette.primary.main } }} />
-                </IconButton>
+                {closeModal && (
+                  <IconButton onClick={onCloseModal} size="small">
+                    <Close
+                      sx={{ "&:hover": { color: palette.primary.main } }}
+                    />
+                  </IconButton>
+                )}
               </Box>
               <Box px="10px">
                 {children}
@@ -111,7 +126,6 @@ const Modal = ({ opened, closeModal, children }) => {
                         backgroundColor: "#032e21",
                       },
                       backgroundColor: "#034934",
-
                       color: "#fff",
                       width: "30%",
                     }}
