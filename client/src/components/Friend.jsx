@@ -40,7 +40,7 @@ const Friend = memo(
       dispatch(patchFriend({ _id, friendId, token })).then(() => {
         setPatchFriendStatus("idle");
         dispatch(setListFix());
-        dispatch(setPostsReloadFix());
+        // dispatch(setPostsReloadFix());
       });
     };
 
