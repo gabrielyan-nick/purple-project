@@ -24,7 +24,7 @@ const ResetPasswordPage = () => {
   const isSmallScreens = useMediaQuery("(max-width: 600px)");
   const mode = useSelector((state) => state.auth.mode);
   const navigate = useNavigate();
-  const { token } = useParams();
+  const { resetToken } = useParams();
 
   const onSetMode = () => {
     dispatch(setMode());
@@ -63,7 +63,7 @@ const ResetPasswordPage = () => {
         borderRadius="15px"
         backgroundColor={palette.background.alt}
       >
-        <ResetPassword resetToken={token} />
+        <ResetPassword resetToken={resetToken} />
       </Box>
     </Box>
   );

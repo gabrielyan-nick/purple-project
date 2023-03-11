@@ -40,6 +40,7 @@ const ResetPassword = ({ resetToken }) => {
       setConfirmError(true);
       return;
     } else {
+      setMessage("");
       const formData = new FormData();
       formData.append("password", password);
       formData.append("token", resetToken);
@@ -146,7 +147,11 @@ const ResetPassword = ({ resetToken }) => {
       </form>
       <Fade in={!!message}>
         <Typography mt="7px" variant="subtitle1">
-          {`${message}. You will be redirected to the login page.`}
+          {`${message}${
+            message === "Password changed successfully"
+              ? ". You will be redirected to the login page."
+              : ""
+          }`}
         </Typography>
       </Fade>
     </WidgetWrapper>
