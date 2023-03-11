@@ -1,6 +1,6 @@
 # Purple Social Network
 
-Purple is a social network web application built using MERN stack (MongoDB, Express.js, React.js, and Node.js). This project provides users with an interactive platform where they can post, comment, like content, and share their thoughts.
+Purple is a social network web application built using MERN stack (MongoDB, Express.js, React.js, and Node.js). This project provides users with an interactive platform where they can post, comment, like content and share their thoughts.
 
 [Deploy on Firebase](https://purple-project13.web.app/)
 
