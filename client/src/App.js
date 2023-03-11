@@ -20,7 +20,7 @@ const App = () => {
 
   return (
     <div className="app">
-      <BrowserRouter basename="https://purple-app-9jnn.onrender.com">
+      <BrowserRouter basename="https://purple-jttl.onrender.com">
         <ThemeProvider theme={theme}>
           <CssBaseline />
           <main>
