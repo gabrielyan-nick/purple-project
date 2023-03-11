@@ -67,6 +67,7 @@ const PostWidget = memo(
     const [likeLoadingStatus, setLikeLoadingStatus] = useState("idle");
     const [addCommentLoadingStatus, setAddCommentLoadingStatus] =
       useState("idle");
+    const [delPostStatus, setDelPostStatus] = useState("idle");
     const postRef = useRef(null);
     const commentRef = useRef(null);
 
@@ -78,7 +79,10 @@ const PostWidget = memo(
     };
 
     const onDelPost = () => {
-      dispatch(deletePost({ postId, token }));
+      setDelPostStatus("loading");
+      dispatch(deletePost({ postId, token })).then(() =>
+        setDelPostStatus("idle")
+      );
     };
 
     const onEditPost = () => {
@@ -141,7 +145,7 @@ const PostWidget = memo(
               userPicturePath={userPicturePath}
             />
             {isMyPost && !isPostEditing ? (
-              <Box display="flex">
+              <Box display="flex" gap="8px">
                 <IconButton
                   size="small"
                   sx={{
@@ -351,6 +355,7 @@ const PostWidget = memo(
           opened={isDelModalOpen}
           closeModal={onCloseDelModal}
           action={onDelPost}
+          actionStatus={delPostStatus}
         >
           Do you really want to delete this post?
         </ConfirmModal>

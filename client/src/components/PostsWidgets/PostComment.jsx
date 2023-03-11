@@ -121,7 +121,7 @@ const PostComment = memo(
               </Box>
             </Box>
             {isMyComment && !isEditing ? (
-              <Box>
+              <Box display='flex' gap='8px'>
                 <IconButton
                   size="small"
                   sx={{
