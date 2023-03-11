@@ -46,8 +46,9 @@ const ProfilePage = () => {
       <Box
         width="100%"
         padding={`20px ${!isSmallScreens ? "50px" : "10px"} `}
-        display={isNonMobileScreens ? "flex" : "block"}
-        gap="15px"
+        display="flex"
+        flexDirection={`${isNonMobileScreens ? "row" : "column"}`}
+        gap="20px"
         justifyContent="space-between"
       >
         <Box flexBasis={isNonMobileScreens ? "26%" : undefined}>
@@ -58,7 +59,7 @@ const ProfilePage = () => {
         <Box
           maxWidth={isNonMobileScreens ? "45%" : undefined}
           flexBasis={isNonMobileScreens ? "45%" : undefined}
-          mt={isNonMobileScreens ? undefined : "20px"}
+          sx={{ order: `${!isNonMobileScreens ? "1" : "0"}` }}
         >
           <ErrorBoundary>
             <PostsWidget
@@ -69,13 +70,12 @@ const ProfilePage = () => {
             />
           </ErrorBoundary>
         </Box>
-        {isNonMobileScreens && (
-          <Box flexBasis="26%">
-            <ErrorBoundary>
-              <FriendListWidget userId={userId} />
-            </ErrorBoundary>
-          </Box>
-        )}
+
+        <Box flexBasis="26%">
+          <ErrorBoundary>
+            <FriendListWidget userId={userId} />
+          </ErrorBoundary>
+        </Box>
       </Box>
     </Box>
   );
