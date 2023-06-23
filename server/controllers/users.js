@@ -72,10 +72,10 @@ export const updateUserInfo = async (req, res) => {
       updatedUser = await User.findByIdAndUpdate(
         id,
         {
-          socialLinks: socialLinks || [],
+          socialLinks: socialLinks || [], // Костыль для удаления всех socialLinks. При удалении единственной ссылки, отправляем [] в formData с фронта, здесь проверяем. Без проверки в socialLinks поместится ''.
         },
         { new: true }
-      ); // Костыль для удаления всех socialLinks. При удалении единственной ссылки, отправляем [] в formData с фронта, здесь проверяем. Без проверки в socialLinks поместится ''.
+      );
     } else {
       updatedUser = await User.findByIdAndUpdate(
         id,

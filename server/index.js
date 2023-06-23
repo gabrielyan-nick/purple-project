@@ -12,7 +12,7 @@ import { verifyToken } from "./middleware/auth.js";
 import { authRoutes, userRoutes, postRoutes } from "./routes/index.js";
 import { changeAvatar } from "./controllers/users.js";
 
-// CONFIGURATION
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 dotenv.config();
@@ -26,12 +26,12 @@ app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
 app.use(cors());
 app.use("/assets", express.static(path.join(__dirname, "public/assets")));
 
-// ROUTES
+
 app.use("/auth", authRoutes);
 app.use("/users", userRoutes);
 app.use("/posts", postRoutes);
 
-// MONGOOSE SETUP
+
 const PORT = process.env.PORT || 6001;
 mongoose
   .connect(process.env.MONGO_URL, {
