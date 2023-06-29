@@ -6,18 +6,17 @@ Purple is a social network web application built using MERN stack (MongoDB, Expr
 
 **Technologies Used**
 
-**Frontend**
+*Frontend:*
 
 - React
 - Redux Toolkit
 - React Router
 - Material-UI
-- Firebase
 - Formik
 - Yup
 - React-Transition-Group
 
-**Backend**
+*Backend:*
 
 - Node.js
 - Express.js
@@ -29,3 +28,7 @@ Purple is a social network web application built using MERN stack (MongoDB, Expr
 - JSON Web Tokens
 - Morgan
 - Nodemailer
+
+*Other tools and libraries:*
+
+- Firebase (for image storage)
