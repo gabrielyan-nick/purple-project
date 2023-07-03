@@ -25,7 +25,7 @@ Purple is a social network web application built using MERN stack (MongoDB, Expr
 - Multer
 - Bcrypt
 - Helmet
-- JSON Web Tokens
+- JWT
 - Morgan
 - Nodemailer
 
